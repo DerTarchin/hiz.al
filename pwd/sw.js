@@ -1,4 +1,12 @@
-const CACHE = "pwd-shell-37";
+const CACHE = "pwd-shell-38";
+
+const SPLASH_SIZES = [
+  "640x1136", "1136x640", "750x1334", "1334x750", "1125x2436", "2436x1125",
+  "1170x2532", "2532x1170", "1179x2556", "2556x1179", "1242x2208", "2208x1242",
+  "828x1792", "1792x828", "1242x2688", "2688x1242", "1284x2778", "2778x1284",
+  "1290x2796", "2796x1290",
+];
+
 const ASSETS = [
   "./",
   "./index.html",
@@ -14,6 +22,8 @@ const ASSETS = [
   "./icon-192-maskable.png",
   "./icon-512-maskable.png",
   "./apple-touch-icon.png",
+  "./launch.png",
+  ...SPLASH_SIZES.map((size) => `./splash/splash-${size}.png`),
 ];
 
 self.addEventListener("install", (event) => {
