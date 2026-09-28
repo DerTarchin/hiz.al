@@ -176,6 +176,11 @@ input::placeholder {
   color: rgba(243, 241, 235, 0.34);
 }
 
+.phrase-secret {
+  -webkit-text-security: disc;
+  text-security: disc;
+}
+
 .field-site:not(.has-suggestions) .menu-label,
 .field-site:not(.has-suggestions) .menu-list {
   border-top: none;

@@ -35,6 +35,14 @@ function rememberEnabled() {
     && rememberInput.checked;
 }
 
+phraseInput.addEventListener("mousedown", () => {
+  phraseInput.removeAttribute("readonly");
+});
+
+phraseInput.addEventListener("keydown", () => {
+  phraseInput.removeAttribute("readonly");
+});
+
 phraseInput.addEventListener("input", () => {
   if (phraseInput.value) phraseInput.placeholder = "Long memorable phrase";
   onCredentialsInput();

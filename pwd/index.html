@@ -63,7 +63,7 @@
 </head>
 <body>
   <main>
-    <form id="form" autocomplete="off">
+    <form id="form" autocomplete="off" data-lpignore="true" data-1p-ignore data-bwignore>
       <div class="phrase-head">
         <label class="lbl" for="phrase">Passphrase</label>
         <label class="remember-toggle" for="remember">
@@ -79,16 +79,20 @@
       <div class="field">
         <input
           id="phrase"
-          type="password"
-          autocomplete="new-password"
+          class="phrase-secret"
+          type="text"
+          inputmode="text"
+          autocomplete="off"
           autocapitalize="off"
           autocorrect="off"
           spellcheck="false"
           enterkeyhint="next"
           placeholder="Long memorable phrase"
+          data-form-type="other"
           data-1p-ignore
           data-lpignore="true"
           data-bwignore
+          readonly
           autofocus
         >
       </div>
