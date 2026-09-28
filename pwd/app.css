@@ -1,0 +1,354 @@
+:root {
+  color-scheme: dark;
+  --bg: #121210;
+  --text: #f3f1eb;
+  --muted: #9a968c;
+  --line: rgba(243, 241, 235, 0.16);
+  --line-strong: rgba(243, 241, 235, 0.55);
+  --fill: rgba(243, 241, 235, 0.05);
+  --selected: rgba(243, 241, 235, 0.1);
+  --viewport-height: 100dvh;
+  --ios-standalone-top-inset: 0px;
+  --app-height: var(--viewport-height);
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: "Kode Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+html.ios-standalone {
+  --ios-standalone-top-inset: 30px;
+  --app-height: calc(var(--viewport-height) + env(safe-area-inset-bottom, 0px));
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html {
+  background: var(--bg);
+  height: var(--app-height);
+}
+
+body {
+  margin: 0;
+  min-height: var(--app-height);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.4;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  padding-top: calc(1.5rem + env(safe-area-inset-top, 0px));
+  padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
+  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
+}
+
+html.ios-standalone body {
+  padding-top: calc(1.5rem + max(var(--ios-standalone-top-inset), env(safe-area-inset-top, 0px)));
+}
+
+::selection {
+  background: var(--text);
+  color: var(--bg);
+}
+
+main {
+  width: min(100%, 24rem);
+  margin: 0 auto;
+}
+
+.lbl {
+  display: block;
+  margin: 0 0 0.4rem 0.1rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.phrase-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 0.4rem;
+}
+
+.phrase-head .lbl {
+  margin: 0 0 0 0.1rem;
+}
+
+.remember-toggle {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  flex: none;
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+html.pwa-standalone .remember-toggle {
+  display: flex;
+}
+
+.remember-toggle input {
+  position: relative;
+  width: 2.35rem;
+  height: 1.3rem;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--fill);
+  appearance: none;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.remember-toggle input::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0.14rem;
+  width: 0.92rem;
+  height: 0.92rem;
+  border-radius: 50%;
+  background: var(--muted);
+  transform: translateY(-50%);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.remember-toggle input:checked {
+  background: rgba(243, 241, 235, 0.14);
+  border-color: var(--line-strong);
+}
+
+.remember-toggle input:checked::before {
+  transform: translate(1.05rem, -50%);
+  background: var(--text);
+}
+
+.site-label {
+  margin-top: 1.35rem;
+}
+
+.field {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--fill);
+  overflow: hidden;
+}
+
+.field:focus-within {
+  border-color: var(--line-strong);
+}
+
+.field input {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.4;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  min-height: 3.05rem;
+  box-sizing: border-box;
+}
+
+input::placeholder {
+  color: rgba(243, 241, 235, 0.34);
+}
+
+.field-site:not(.has-suggestions) .menu-label,
+.field-site:not(.has-suggestions) .menu-list {
+  border-top: none;
+}
+
+.field-site.has-suggestions .menu-label:not([hidden]) {
+  border-top: 1px solid var(--line);
+}
+
+.field-site.has-suggestions .menu-label[hidden] + .menu-list:not(:empty) {
+  border-top: 1px solid var(--line);
+}
+
+.field-site.has-suggestions .menu-label:not([hidden]) + .menu-list {
+  border-top: none;
+}
+
+.menu-list:empty {
+  display: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-label {
+  margin: 0;
+  padding: 0.65rem 1rem 0.15rem;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.2rem 0 0.3rem;
+  max-height: min(16rem, 38dvh);
+  overflow: auto;
+}
+
+.menu-list button {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.98rem;
+  text-align: left;
+  padding: 0.62rem 1rem;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.menu-list button.exact {
+  color: var(--muted);
+}
+
+.menu-list button[aria-selected="true"] {
+  background: var(--selected);
+  color: var(--text);
+}
+
+.menu-list button:hover {
+  background: rgba(243, 241, 235, 0.06);
+}
+
+.error {
+  margin: 0.85rem 0 0;
+  color: #e7b2a2;
+  font-size: 0.85rem;
+}
+
+.result {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 1.6rem;
+  padding-top: 0.2rem;
+}
+
+.password {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 1.12rem;
+  letter-spacing: 0.03em;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  user-select: all;
+  cursor: pointer;
+}
+
+.password.pending {
+  color: var(--muted);
+  font-family: var(--font);
+  font-size: 0.95rem;
+  letter-spacing: 0;
+  user-select: none;
+  cursor: default;
+}
+
+.icon-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.icon-btn:hover,
+.icon-btn:focus-visible {
+  border-color: var(--line-strong);
+}
+
+.icon-btn svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.fine {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
+  margin: 0;
+  padding: 0 max(1.25rem, env(safe-area-inset-right, 0px))
+    0 max(1.25rem, env(safe-area-inset-left, 0px));
+  text-align: center;
+  color: rgba(243, 241, 235, 0.26);
+  font-size: 0.72rem;
+  pointer-events: none;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1.15rem + env(safe-area-inset-bottom, 0px));
+  z-index: 2;
+  transform: translateX(-50%) translateY(6px);
+  opacity: 0;
+  pointer-events: none;
+  padding: 0.55rem 0.8rem;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    transition: none;
+  }
+}
