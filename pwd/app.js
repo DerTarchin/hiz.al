@@ -311,7 +311,7 @@ function showCopiedFeedback() {
     copyButton.classList.remove("is-copied");
     copyButton.setAttribute("aria-label", "Copy password");
     copyDoneEl.hidden = true;
-  }, 2000);
+  }, 5000);
 }
 
 async function writeClipboard(text) {

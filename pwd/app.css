@@ -363,10 +363,20 @@ input::placeholder {
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.01em;
-  background: linear-gradient(135deg, var(--accent-copy-start), var(--accent-copy-end));
+  background: linear-gradient(
+    135deg,
+    var(--accent-copy-start) 0%,
+    var(--accent-copy-end) 50%,
+    var(--accent-copy-start) 100%
+  );
+  background-size: 220% 220%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+.copy-btn.is-copied .copy-btn__label {
+  animation: copy-gradient-flow 2.2s ease-in-out infinite;
 }
 
 .copy-btn.is-copied {
@@ -404,8 +414,24 @@ input:focus-visible {
   outline: none;
 }
 
+@keyframes copy-gradient-flow {
+  0%,
+  100% {
+    background-position: 0% 0%;
+  }
+
+  50% {
+    background-position: 100% 100%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .copy-btn {
     transition: none;
+  }
+
+  .copy-btn.is-copied .copy-btn__label {
+    animation: none;
+    background-size: 100% 100%;
   }
 }
