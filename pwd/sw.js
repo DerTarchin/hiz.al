@@ -1,4 +1,4 @@
-const CACHE = "pwd-shell-18";
+const CACHE = "pwd-shell-19";
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,9 +8,11 @@ const ASSETS = [
   "./sites.js",
   "./argon2.js",
   "./manifest.json",
-  "./favicon.svg",
+  "./favicon.ico",
   "./icon-192.png",
   "./icon-512.png",
+  "./icon-192-maskable.png",
+  "./icon-512-maskable.png",
   "./apple-touch-icon.png",
 ];
 

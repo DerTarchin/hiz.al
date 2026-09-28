@@ -1,5 +1,5 @@
 {
-  "name": "pwd",
+  "name": "Password Generator",
   "short_name": "pwd",
   "description": "Deterministic passwords from one passphrase.",
   "start_url": "./",
@@ -9,16 +9,33 @@
   "theme_color": "#121210",
   "icons": [
     {
+      "src": "favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "16x16 32x32"
+    },
+    {
       "src": "icon-192.png",
-      "sizes": "192x192",
       "type": "image/png",
+      "sizes": "192x192",
       "purpose": "any"
     },
     {
       "src": "icon-512.png",
-      "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192-maskable.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-512-maskable.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
     }
   ]
 }
