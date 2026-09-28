@@ -10,10 +10,15 @@
   --accent-fill-strong: rgba(64, 21, 112, 0.22);
   --bg: #121018;
   --text: #f3f1eb;
-  --muted: #a39eb5;
-  --line: rgba(243, 241, 235, 0.14);
-  --line-strong: rgba(122, 140, 210, 0.45);
-  --fill: rgba(243, 241, 235, 0.04);
+  --ink: 142, 176, 255;
+  --muted: #a8b6de;
+  --muted-soft: rgba(var(--ink), 0.55);
+  --muted-faint: rgba(var(--ink), 0.46);
+  --muted-ghost: rgba(var(--ink), 0.38);
+  --line: rgba(var(--ink), 0.2);
+  --line-strong: rgba(122, 156, 232, 0.48);
+  --fill: rgba(var(--ink), 0.065);
+  --surface-hover: rgba(var(--ink), 0.09);
   --selected: linear-gradient(
     135deg,
     rgba(40, 60, 134, 0.28),
@@ -189,13 +194,65 @@ html.pwa-standalone .remember-toggle {
   box-sizing: border-box;
 }
 
+.field-site-input-wrap {
+  position: relative;
+}
+
+.field-site-input-wrap input {
+  padding-right: 2.85rem;
+}
+
+.site-clear {
+  position: absolute;
+  top: 50%;
+  right: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.05rem;
+  height: 2.05rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted-soft);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.site-clear:hover,
+.site-clear:focus-visible {
+  color: var(--text);
+  background: var(--surface-hover);
+}
+
+.site-clear svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.site-clear[hidden] {
+  display: none;
+}
+
 input::placeholder {
-  color: rgba(243, 241, 235, 0.34);
+  color: var(--muted-ghost);
 }
 
 .phrase-secret {
   -webkit-text-security: disc;
   text-security: disc;
+}
+
+html.passphrase-locked #phrase {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+html.passphrase-locked label[for="phrase"] {
+  opacity: 0.65;
 }
 
 .field-site:not(.has-suggestions) .menu-label,
@@ -255,13 +312,26 @@ input::placeholder {
   text-overflow: ellipsis;
 }
 
-.menu-list button.exact {
-  color: var(--muted);
-}
-
 .menu-list button[aria-selected="true"] {
   background: var(--selected);
   color: var(--text);
+}
+
+.menu-list button .menu-match-hit {
+  color: var(--text);
+}
+
+.menu-list button .menu-match-muted {
+  color: var(--muted-faint);
+}
+
+.menu-list button[aria-selected="true"] .menu-match-muted {
+  color: var(--muted-soft);
+}
+
+.menu-list button .menu-suggestion-divider {
+  padding: 0 0.38rem;
+  letter-spacing: 0;
 }
 
 .menu-list button:hover {
@@ -404,7 +474,7 @@ input::placeholder {
   padding: 0 max(1.25rem, env(safe-area-inset-right, 0px))
     0 max(1.25rem, env(safe-area-inset-left, 0px));
   text-align: center;
-  color: rgba(163, 158, 181, 0.38);
+  color: var(--muted-faint);
   font-size: 0.72rem;
   pointer-events: none;
 }

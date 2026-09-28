@@ -1,6 +1,6 @@
 {
   "name": "Password Generator",
-  "short_name": "pwd",
+  "short_name": "Password Generator",
   "description": "Deterministic passwords from one passphrase.",
   "start_url": "./",
   "scope": "./",

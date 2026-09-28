@@ -93,29 +93,42 @@
           data-lpignore="true"
           data-bwignore
           readonly
-          autofocus
         >
       </div>
 
       <label class="lbl site-label" for="site">Site</label>
       <div class="field field-site" id="site-field">
-        <input
-          id="site"
-          type="text"
-          role="combobox"
-          aria-autocomplete="list"
-          aria-expanded="false"
-          aria-controls="menu-list"
-          autocomplete="off"
-          autocapitalize="off"
-          autocorrect="off"
-          spellcheck="false"
-          enterkeyhint="go"
-          placeholder="Name or URL"
-          data-1p-ignore
-          data-lpignore="true"
-        >
-        <p class="menu-label" id="menu-label" hidden>Favorites</p>
+        <div class="field-site-input-wrap">
+          <input
+            id="site"
+            type="text"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-controls="menu-list"
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+            enterkeyhint="go"
+            placeholder="Name or URL"
+            data-1p-ignore
+            data-lpignore="true"
+          >
+          <button
+            class="site-clear"
+            id="site-clear"
+            type="button"
+            hidden
+            aria-label="Clear site"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"></circle>
+              <path d="M9.2 9.2l5.6 5.6M14.8 9.2l-5.6 5.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+            </svg>
+          </button>
+        </div>
+        <p class="menu-label" id="menu-label" hidden></p>
         <ul class="menu-list" id="menu-list" role="listbox"></ul>
       </div>
       <p class="error" id="error" hidden></p>

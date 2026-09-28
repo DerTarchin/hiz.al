@@ -176,23 +176,47 @@ export function resolveExact(raw) {
   return { kind: "exact", name, key: lower, known: false };
 }
 
+const SUGGESTION_LIMIT = 3;
+
+function sortSiteMatches(scored) {
+  scored.sort((a, b) => a[0] - b[0] || a[1].name.localeCompare(b[1].name));
+}
+
 export function searchSites(raw) {
   const q = String(raw ?? "").trim().replace(/\s+/g, " ").toLowerCase();
   if (!q) return [];
-  const scored = [];
+
+  const prefixScored = [];
   for (const entry of SITES) {
-    const score = scoreSite(entry, q);
-    if (score > 0) scored.push([score, entry]);
+    const matchedWordLength = shortestWordPrefixMatch(entry, q);
+    if (matchedWordLength == null) continue;
+    prefixScored.push([matchedWordLength, entry]);
   }
-  scored.sort((a, b) => b[0] - a[0] || a[1].name.localeCompare(b[1].name));
-  return scored.slice(0, 8).map((item) => item[1]);
+  sortSiteMatches(prefixScored);
+  const results = prefixScored.slice(0, SUGGESTION_LIMIT).map((item) => item[1]);
+  if (results.length >= SUGGESTION_LIMIT) return results;
+
+  const seen = new Set(results.map((entry) => entry.key));
+  const infixScored = [];
+  for (const entry of SITES) {
+    if (seen.has(entry.key)) continue;
+    const matchedWordLength = shortestWordInfixMatch(entry, q);
+    if (matchedWordLength == null) continue;
+    infixScored.push([matchedWordLength, entry]);
+  }
+  sortSiteMatches(infixScored);
+  for (const [, entry] of infixScored) {
+    if (results.length >= SUGGESTION_LIMIT) break;
+    results.push(entry);
+    seen.add(entry.key);
+  }
+  return results;
 }
 
 /**
  * Empty input lists favorites and selects nothing.
- * A single catalog match is selected, with the typed text offered when it
- * would produce a different key. Several matches leave the typed text selected
- * unless that text is itself a known site.
+ * With catalog matches, the first suggestion is selected; “Use …” is only
+ * selected when there are no catalog rows.
  */
 function siteMatchesQueryExactly(entry, raw) {
   const q = String(raw ?? "").trim().replace(/\s+/g, " ").toLowerCase();
@@ -206,8 +230,8 @@ export function buildMenu(raw) {
   const original = String(raw ?? "").trim();
   if (!original) {
     return {
-      label: "Favorites",
-      rows: FAVORITES.map(asSiteRow),
+      label: null,
+      rows: FAVORITES.map((entry) => asSiteRow(entry)),
       active: -1,
     };
   }
@@ -223,13 +247,15 @@ export function buildMenu(raw) {
       }
     }
   }
-  const rows = matches.map(asSiteRow);
+  matches = matches.slice(0, SUGGESTION_LIMIT);
+  const rows = matches.map((entry) => asSiteRow(entry, original));
   if (exact && !exact.known && !rows.some((row) => row.key === exact.key)) {
     rows.push({ kind: "exact", name: exact.name, key: exact.key });
   }
   let active = -1;
-  if (matches.length === 1) {
-    active = 0;
+  const firstSiteIndex = rows.findIndex((row) => row.kind === "site");
+  if (firstSiteIndex >= 0) {
+    active = firstSiteIndex;
   } else if (!exact?.known) {
     active = rows.findIndex((row) => row.kind === "exact");
   }
@@ -250,18 +276,128 @@ export function rowForInput(raw) {
   return null;
 }
 
-function asSiteRow(entry) {
-  return { kind: "site", name: entry.name, key: entry.key };
+function asSiteRow(entry, query = "") {
+  const row = { kind: "site", name: entry.name, key: entry.key };
+  const q = String(query ?? "").trim().toLowerCase();
+  if (!q) return row;
+  if (matchHighlightRange(entry.name, q)) return row;
+  const host = bestMatchingHostForSuggestion(entry, q);
+  if (host) row.matchHost = host;
+  return row;
 }
 
-function scoreSite(entry, q) {
-  const name = entry.name.toLowerCase();
-  if (name === q || entry.key === q || entry.aliases.includes(q)) return 100;
-  if (name.startsWith(q) || entry.key.startsWith(q)) return 80;
-  if (entry.aliases.some((alias) => alias.startsWith(q))) return 76;
-  if (entry.hosts.some((host) => host.startsWith(q) || host.split(".")[0].startsWith(q))) return 74;
-  if (name.includes(q) || entry.key.includes(q) || entry.aliases.some((alias) => alias.includes(q))) return 50;
-  return 0;
+function siteSearchTokensCatalog(entry) {
+  const tokens = [];
+  const add = (text) => {
+    const raw = String(text ?? "").trim().toLowerCase();
+    if (!raw) return;
+    tokens.push(raw);
+    for (const part of raw.split(/[\s*/]+/)) {
+      if (part) tokens.push(part);
+    }
+  };
+  add(entry.name);
+  add(entry.key);
+  for (const alias of entry.aliases) add(alias);
+  return tokens;
+}
+
+function bestMatchingHost(entry, q) {
+  let best = null;
+  for (const host of entry.hosts) {
+    const label = host.split(".")[0].toLowerCase();
+    if (!label.startsWith(q) && !label.includes(q)) continue;
+    const rank = label.startsWith(q) ? label.length : label.length + 10_000;
+    if (best == null || rank < best.rank) best = { host, rank };
+  }
+  return best?.host ?? null;
+}
+
+function bestMatchingHostForSuggestion(entry, q) {
+  const fromHost = bestMatchingHost(entry, q);
+  if (fromHost) return fromHost;
+  for (const alias of entry.aliases) {
+    const aliasLower = alias.toLowerCase();
+    if (!aliasLower.startsWith(q) && !aliasLower.includes(q)) continue;
+    const labelMatch = entry.hosts.find(
+      (host) => host.split(".")[0].toLowerCase() === aliasLower,
+    );
+    if (labelMatch) return labelMatch;
+    const prefixMatch = entry.hosts.find((host) => {
+      const label = host.split(".")[0].toLowerCase();
+      return label.startsWith(q) || label.includes(q);
+    });
+    if (prefixMatch) return prefixMatch;
+    if (entry.hosts[0]) return entry.hosts[0];
+  }
+  return null;
+}
+
+/** Inclusive start, exclusive end in displayName; null if query empty or no overlap. */
+export function matchHighlightRange(displayName, query) {
+  const q = String(query ?? "").trim().replace(/\s+/g, " ").toLowerCase();
+  if (!q) return null;
+  const name = String(displayName ?? "");
+  if (!name) return null;
+
+  const lower = name.toLowerCase();
+  if (lower.startsWith(q)) return { start: 0, end: q.length };
+
+  const wordStart = findWordPrefixRange(name, q);
+  if (wordStart) return wordStart;
+
+  const index = lower.indexOf(q);
+  if (index >= 0) return { start: index, end: index + q.length };
+
+  let collapsed = "";
+  const indexMap = [];
+  for (let i = 0; i < name.length; i += 1) {
+    const ch = name[i];
+    if (/\s/.test(ch)) continue;
+    indexMap.push(i);
+    collapsed += ch.toLowerCase();
+  }
+  const start = collapsed.indexOf(q);
+  if (start < 0) return null;
+  const end = start + q.length;
+  return { start: indexMap[start], end: indexMap[end - 1] + 1 };
+}
+
+function siteSearchTokens(entry) {
+  const tokens = siteSearchTokensCatalog(entry);
+  for (const host of entry.hosts) {
+    const label = host.split(".")[0];
+    if (label) tokens.push(label.toLowerCase());
+  }
+  return tokens;
+}
+
+/** Shortest token length that starts with q, or null if none. */
+function shortestWordPrefixMatch(entry, q) {
+  let best = null;
+  for (const token of siteSearchTokens(entry)) {
+    if (!token.startsWith(q)) continue;
+    if (best == null || token.length < best) best = token.length;
+  }
+  return best;
+}
+
+/** Shortest token length that contains q but does not start with it. */
+function shortestWordInfixMatch(entry, q) {
+  let best = null;
+  for (const token of siteSearchTokens(entry)) {
+    if (!token.includes(q) || token.startsWith(q)) continue;
+    if (best == null || token.length < best) best = token.length;
+  }
+  return best;
+}
+
+function findWordPrefixRange(name, q) {
+  const pattern = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = name.match(new RegExp(`(^|[\\s*/])(${pattern})`, "i"));
+  if (!match || match.index == null) return null;
+  const start = match.index + match[1].length;
+  return { start, end: start + q.length };
 }
 
 function compoundSuffixSize(labels) {

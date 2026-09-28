@@ -1,8 +1,9 @@
 import { deriveMasterKey, passwordFromMaster } from "./derive.js";
-import { buildMenu, cleanHostInput, rowForInput } from "./sites.js";
+import { buildMenu, cleanHostInput, matchHighlightRange, rowForInput } from "./sites.js";
 
 const phraseInput = document.querySelector("#phrase");
 const siteInput = document.querySelector("#site");
+const siteClearBtn = document.querySelector("#site-clear");
 const siteField = document.querySelector("#site-field");
 const form = document.querySelector("#form");
 const rememberInput = document.querySelector("#remember");
@@ -36,11 +37,53 @@ function rememberEnabled() {
     && rememberInput.checked;
 }
 
+function isIosDevice() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
+function shouldLockPassphrase() {
+  return isIosDevice()
+    && document.documentElement.classList.contains("pwa-standalone")
+    && rememberInput.checked
+    && Boolean(sessionKey)
+    && !phraseInput.value.trim();
+}
+
+function updatePassphraseFieldState() {
+  const lock = shouldLockPassphrase();
+  document.documentElement.classList.toggle("passphrase-locked", lock);
+  phraseInput.tabIndex = lock ? -1 : 0;
+  if (lock) {
+    phraseInput.setAttribute("readonly", "");
+    phraseInput.setAttribute("aria-disabled", "true");
+    return;
+  }
+  phraseInput.removeAttribute("aria-disabled");
+  if (!phraseInput.value) phraseInput.setAttribute("readonly", "");
+}
+
+function focusSite() {
+  siteInput.focus({ preventScroll: true });
+}
+
+function focusInitial() {
+  if (shouldLockPassphrase()) focusSite();
+  else focusPhrase();
+}
+
+phraseInput.addEventListener("focus", () => {
+  if (!shouldLockPassphrase()) return;
+  phraseInput.blur();
+  focusSite();
+});
+
 phraseInput.addEventListener("mousedown", () => {
+  if (shouldLockPassphrase()) return;
   phraseInput.removeAttribute("readonly");
 });
 
 phraseInput.addEventListener("keydown", () => {
+  if (shouldLockPassphrase()) return;
   phraseInput.removeAttribute("readonly");
 });
 
@@ -50,7 +93,7 @@ phraseInput.addEventListener("input", () => {
 });
 
 phraseInput.addEventListener("blur", () => {
-  void onCredentialsCommit();
+  void onCredentialsCommit(null, { implicit: true });
 });
 
 rememberInput.addEventListener("change", () => {
@@ -78,9 +121,33 @@ siteInput.addEventListener("input", () => {
   onCredentialsInput();
 });
 
-siteInput.addEventListener("blur", () => {
+menuList.addEventListener("mousedown", (event) => {
+  event.preventDefault();
+});
+
+siteClearBtn.addEventListener("mousedown", (event) => {
+  event.preventDefault();
+});
+
+siteClearBtn.addEventListener("click", () => {
+  siteInput.value = "";
+  resetSelection();
+  window.clearTimeout(copyDebounceTimer);
+  clearPasswordOutput();
+  renderMenu();
+  siteInput.focus();
+});
+
+function syncSiteClear() {
+  siteClearBtn.hidden = siteInput.value.length === 0;
+}
+
+siteInput.addEventListener("blur", (event) => {
   if (suppressSiteBlurCommit) return;
-  void onCredentialsCommit();
+  const next = event.relatedTarget;
+  if (next instanceof Node && menuList.contains(next)) return;
+  if (next === siteClearBtn) return;
+  void onCredentialsCommit(null, { implicit: true });
 });
 
 siteInput.addEventListener("keydown", (event) => {
@@ -139,15 +206,18 @@ async function boot() {
       rememberInput.checked = true;
     }
     phraseInput.placeholder = "Saved on this device";
-    focusPhrase();
+    updatePassphraseFieldState();
+    focusInitial();
   } catch {
     await deleteRecord();
+    updatePassphraseFieldState();
     focusPhrase();
   }
 }
 
 window.addEventListener("pageshow", () => {
-  focusPhrase();
+  updatePassphraseFieldState();
+  focusInitial();
 });
 
 async function onRememberToggle() {
@@ -176,14 +246,46 @@ async function onRememberToggle() {
   } catch {
     showError("Could not forget the saved key.");
   }
-  if (!phraseInput.value) phraseInput.focus();
+  updatePassphraseFieldState();
+  if (!phraseInput.value) focusInitial();
+}
+
+function rowForPinnedCommit() {
+  if (!pinned) return null;
+  const menu = currentMenu();
+  const fromMenu = menu.rows.find(
+    (row) => row.kind === pinned.kind && row.key === pinned.key,
+  );
+  if (fromMenu) return fromMenu;
+  const fromInput = rowForInput(siteInput.value);
+  if (fromInput && fromInput.kind === pinned.kind && fromInput.key === pinned.key) {
+    return fromInput;
+  }
+  return null;
+}
+
+function rowForExplicitCommit() {
+  const pinnedRow = rowForPinnedCommit();
+  if (pinnedRow) return pinnedRow;
+  const menu = currentMenu();
+  if (manualActive != null && menu.rows.length) {
+    const index = Math.max(0, Math.min(menu.rows.length - 1, manualActive));
+    return menu.rows[index];
+  }
+  if (menu.active >= 0) return menu.rows[menu.active];
+  return rowForInput(siteInput.value);
+}
+
+function rowForImplicitCommit() {
+  const pinnedRow = rowForPinnedCommit();
+  if (pinnedRow) return pinnedRow;
+  const row = rowForInput(siteInput.value);
+  if (row?.kind === "site") return row;
+  return null;
 }
 
 function rowForGeneration(commit) {
-  if (commit) {
-    const menu = currentMenu();
-    if (menu.active >= 0) return menu.rows[menu.active];
-  }
+  if (commit) return rowForExplicitCommit();
   return rowForInput(siteInput.value);
 }
 
@@ -205,9 +307,23 @@ function onCredentialsInput() {
   void generate({ commit: false, copy: false });
 }
 
-async function onCredentialsCommit() {
+async function onCredentialsCommit(explicitRow = null, { implicit = false } = {}) {
   window.clearTimeout(copyDebounceTimer);
-  await generate({ commit: true, copy: true });
+  const row = explicitRow ?? (implicit ? rowForImplicitCommit() : rowForExplicitCommit());
+  if (!row) {
+    if (implicit && readyToGenerate()) {
+      await generate({ commit: false, copy: false });
+      return;
+    }
+    clearPasswordOutput();
+    return;
+  }
+  commitRow(row);
+  if (!readyToGenerate()) {
+    clearPasswordOutput();
+    return;
+  }
+  await generate({ commit: false, copy: true });
 }
 
 function clearPasswordOutput() {
@@ -279,6 +395,7 @@ async function masterKey() {
       phraseInput.value = "";
       sessionPhrase = "";
       phraseInput.placeholder = "Saved on this device";
+      updatePassphraseFieldState();
     }
     return sessionKey;
   }
@@ -358,10 +475,18 @@ function dismissExactRowIfNeeded(row) {
   if (row?.kind === "exact") dismissedExactKey = row.key;
 }
 
+function shouldSuppressMenuAutoHighlight() {
+  if (manualActive != null) return false;
+  if (!dismissedExactKey) return false;
+  const row = rowForInput(siteInput.value);
+  return row?.kind === "exact" && row.key === dismissedExactKey;
+}
+
 function commitRow(row) {
   dismissExactRowIfNeeded(row);
   pinRow(row);
-  if (siteInput.value !== row.name) siteInput.value = row.name;
+  if (row.kind !== "exact") dismissedExactKey = null;
+  if (row.kind !== "exact" && siteInput.value !== row.name) siteInput.value = row.name;
   renderMenu();
   suppressSiteBlurCommit = true;
   siteInput.blur();
@@ -389,7 +514,10 @@ function applyDismissedExact(menu) {
 }
 
 function currentMenu() {
-  const menu = applyDismissedExact(buildMenu(siteInput.value));
+  let menu = applyDismissedExact(buildMenu(siteInput.value));
+  if (shouldSuppressMenuAutoHighlight()) {
+    menu = { ...menu, active: -1 };
+  }
   if (manualActive != null && menu.rows.length) {
     const active = Math.max(0, Math.min(menu.rows.length - 1, manualActive));
     return { ...menu, active };
@@ -402,8 +530,62 @@ function currentMenu() {
   return menu;
 }
 
+function appendMenuTextSpan(parent, text, muted, className = "") {
+  if (!text) return;
+  const span = document.createElement("span");
+  span.className = muted ? "menu-match-muted" : "menu-match-hit";
+  if (className) span.classList.add(className);
+  span.textContent = text;
+  parent.appendChild(span);
+}
+
+function appendHighlightedSiteName(parent, name, query) {
+  const range = matchHighlightRange(name, query);
+  if (!range) {
+    appendMenuTextSpan(parent, name, Boolean(String(query ?? "").trim()));
+    return;
+  }
+  appendMenuTextSpan(parent, name.slice(0, range.start), true);
+  appendMenuTextSpan(parent, name.slice(range.start, range.end), false);
+  appendMenuTextSpan(parent, name.slice(range.end), true);
+}
+
+function setMenuButtonLabel(button, row, query) {
+  const trimmedQuery = String(query ?? "").trim();
+  const plain = row.kind === "exact"
+    ? `Use “${row.name}”`
+    : (row.matchHost ? `${row.name} · ${row.matchHost}` : row.name);
+  button.setAttribute(
+    "aria-label",
+    row.kind === "exact"
+      ? `Use ${row.name}`
+      : (row.matchHost ? `${row.name}, ${row.matchHost}` : row.name),
+  );
+
+  if (!trimmedQuery) {
+    button.textContent = plain;
+    return;
+  }
+
+  button.replaceChildren();
+  if (row.kind === "exact") {
+    appendMenuTextSpan(button, "Use “", true);
+    appendHighlightedSiteName(button, row.name, trimmedQuery);
+    appendMenuTextSpan(button, "”", true);
+    return;
+  }
+  if (row.matchHost) {
+    appendMenuTextSpan(button, row.name, true);
+    appendMenuTextSpan(button, "·", true, "menu-suggestion-divider");
+    appendHighlightedSiteName(button, row.matchHost, trimmedQuery);
+    return;
+  }
+  appendHighlightedSiteName(button, row.name, trimmedQuery);
+}
+
 function renderMenu() {
   const menu = currentMenu();
+  const menuQuery = siteInput.value;
   const hasSuggestions = menu.rows.length > 0;
   siteField.classList.toggle("has-suggestions", hasSuggestions);
   menuLabel.hidden = !menu.label;
@@ -414,6 +596,8 @@ function renderMenu() {
   if (activeId) siteInput.setAttribute("aria-activedescendant", activeId);
   else siteInput.removeAttribute("aria-activedescendant");
 
+  syncSiteClear();
+
   menu.rows.forEach((row, index) => {
     const item = document.createElement("li");
     item.setAttribute("role", "presentation");
@@ -423,11 +607,10 @@ function renderMenu() {
     button.setAttribute("role", "option");
     button.setAttribute("aria-selected", index === menu.active ? "true" : "false");
     button.className = row.kind === "exact" ? "exact" : "";
-    button.textContent = row.kind === "exact" ? `Use “${row.name}”` : row.name;
+    setMenuButtonLabel(button, row, menuQuery);
     const choose = (event) => {
       if (event) event.preventDefault();
-      commitRow(row);
-      void onCredentialsCommit();
+      void onCredentialsCommit(row);
     };
     button.addEventListener("pointerdown", (event) => {
       if (event.button > 0) return;
