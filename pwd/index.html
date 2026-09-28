@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#121210">
+  <meta name="theme-color" content="#14121c">
   <meta name="color-scheme" content="dark">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -123,16 +123,29 @@
 
     <div class="result" id="result" hidden>
       <p class="password" id="password" translate="no"></p>
-      <button class="icon-btn" id="copy" type="button" aria-label="Copy password">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="8.2" y="8.2" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"></rect>
-          <path d="M6.2 15.5V6.2A2 2 0 0 1 8.2 4.2h8.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-        </svg>
+      <button class="copy-btn" id="copy" type="button" aria-label="Copy password">
+        <span class="copy-btn__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <rect x="8.2" y="8.2" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"></rect>
+            <path d="M6.2 15.5V6.2A2 2 0 0 1 8.2 4.2h8.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+          </svg>
+        </span>
+        <span class="copy-btn__done" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <defs>
+              <linearGradient id="pwd-copy-grad" x1="5" y1="7" x2="19" y2="18" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#8eb0ff"></stop>
+                <stop offset="100%" stop-color="#d08cff"></stop>
+              </linearGradient>
+            </defs>
+            <path d="M5 12.5 9.5 17 19 7.5" fill="none" stroke="url(#pwd-copy-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          <span class="copy-btn__label">Copied!</span>
+        </span>
       </button>
     </div>
   </main>
   <p class="fine">Nothing leaves this device.</p>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="./argon2.js"></script>
   <script type="module" src="./app.js"></script>
 </body>

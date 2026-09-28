@@ -11,7 +11,7 @@ const menuList = document.querySelector("#menu-list");
 const result = document.querySelector("#result");
 const passwordEl = document.querySelector("#password");
 const copyButton = document.querySelector("#copy");
-const toastEl = document.querySelector("#toast");
+const copyDoneEl = copyButton.querySelector(".copy-btn__done");
 const errorEl = document.querySelector("#error");
 
 const DB_NAME = "hiz-pwd";
@@ -23,12 +23,13 @@ let sessionPhrase = "";
 let manualActive = null;
 let pinned = null;
 let busy = false;
-let toastTimer = 0;
+let copiedFeedbackTimer = 0;
 let copyDebounceTimer = 0;
 let generateSerial = 0;
 let passwordText = "";
 let lastAutoCopiedPassword = "";
 let dismissedExactKey = null;
+let suppressSiteBlurCommit = false;
 
 function rememberEnabled() {
   return document.documentElement.classList.contains("pwa-standalone")
@@ -78,6 +79,7 @@ siteInput.addEventListener("input", () => {
 });
 
 siteInput.addEventListener("blur", () => {
+  if (suppressSiteBlurCommit) return;
   void onCredentialsCommit();
 });
 
@@ -287,17 +289,29 @@ async function masterKey() {
 async function autoCopyPassword(text) {
   if (text === lastAutoCopiedPassword) return;
   lastAutoCopiedPassword = text;
-  await copyToClipboardWithToast(text);
+  await copyToClipboardWithFeedback(text);
 }
 
 async function copyPassword(text) {
   lastAutoCopiedPassword = text;
-  await copyToClipboardWithToast(text);
+  await copyToClipboardWithFeedback(text);
 }
 
-async function copyToClipboardWithToast(text) {
+async function copyToClipboardWithFeedback(text) {
   const ok = await writeClipboard(text);
-  toast(ok ? "Copied to clipboard" : "Could not copy");
+  if (ok) showCopiedFeedback();
+}
+
+function showCopiedFeedback() {
+  copyButton.classList.add("is-copied");
+  copyButton.setAttribute("aria-label", "Copied to clipboard");
+  copyDoneEl.hidden = false;
+  window.clearTimeout(copiedFeedbackTimer);
+  copiedFeedbackTimer = window.setTimeout(() => {
+    copyButton.classList.remove("is-copied");
+    copyButton.setAttribute("aria-label", "Copy password");
+    copyDoneEl.hidden = true;
+  }, 2000);
 }
 
 async function writeClipboard(text) {
@@ -349,6 +363,11 @@ function commitRow(row) {
   pinRow(row);
   if (siteInput.value !== row.name) siteInput.value = row.name;
   renderMenu();
+  suppressSiteBlurCommit = true;
+  siteInput.blur();
+  window.setTimeout(() => {
+    suppressSiteBlurCommit = false;
+  }, 0);
 }
 
 function applyDismissedExact(menu) {
@@ -408,8 +427,7 @@ function renderMenu() {
     const choose = (event) => {
       if (event) event.preventDefault();
       commitRow(row);
-      siteInput.focus();
-      onCredentialsInput();
+      void onCredentialsCommit();
     };
     button.addEventListener("pointerdown", (event) => {
       if (event.button > 0) return;
@@ -422,15 +440,6 @@ function renderMenu() {
   if (menu.active >= 0) {
     menuList.querySelector(`#opt-${menu.active}`)?.scrollIntoView({ block: "nearest" });
   }
-}
-
-function toast(message) {
-  toastEl.textContent = message;
-  toastEl.classList.add("show");
-  window.clearTimeout(toastTimer);
-  toastTimer = window.setTimeout(() => {
-    toastEl.classList.remove("show");
-  }, 1700);
 }
 
 function showError(message) {

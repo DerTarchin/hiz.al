@@ -1,4 +1,4 @@
-const CACHE = "pwd-shell-19";
+const CACHE = "pwd-shell-21";
 const ASSETS = [
   "./",
   "./index.html",

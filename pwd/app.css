@@ -1,12 +1,24 @@
 :root {
   color-scheme: dark;
-  --bg: #121210;
+  --accent-start: #283c86;
+  --accent-end: #401570;
+  --accent-copy-start: #8eb0ff;
+  --accent-copy-end: #d08cff;
+  --accent-mid: #4a3d9a;
+  --accent-glow: rgba(90, 111, 184, 0.35);
+  --accent-fill: rgba(40, 60, 134, 0.14);
+  --accent-fill-strong: rgba(64, 21, 112, 0.22);
+  --bg: #121018;
   --text: #f3f1eb;
-  --muted: #9a968c;
-  --line: rgba(243, 241, 235, 0.16);
-  --line-strong: rgba(243, 241, 235, 0.55);
-  --fill: rgba(243, 241, 235, 0.05);
-  --selected: rgba(243, 241, 235, 0.1);
+  --muted: #a39eb5;
+  --line: rgba(243, 241, 235, 0.14);
+  --line-strong: rgba(122, 140, 210, 0.45);
+  --fill: rgba(243, 241, 235, 0.04);
+  --selected: linear-gradient(
+    135deg,
+    rgba(40, 60, 134, 0.28),
+    rgba(64, 21, 112, 0.22)
+  );
   --viewport-height: 100dvh;
   --ios-standalone-top-inset: 0px;
   --app-height: var(--viewport-height);
@@ -35,7 +47,10 @@ html {
 body {
   margin: 0;
   min-height: var(--app-height);
-  background: var(--bg);
+  background:
+    radial-gradient(ellipse 130% 90% at 0% 0%, rgba(40, 60, 134, 0.2), transparent 58%),
+    radial-gradient(ellipse 110% 75% at 100% 100%, rgba(64, 21, 112, 0.16), transparent 52%),
+    var(--bg);
   color: var(--text);
   font-family: var(--font);
   font-size: 16px;
@@ -53,8 +68,8 @@ html.ios-standalone body {
 }
 
 ::selection {
-  background: var(--text);
-  color: var(--bg);
+  background: rgba(90, 111, 184, 0.45);
+  color: var(--text);
 }
 
 main {
@@ -131,8 +146,8 @@ html.pwa-standalone .remember-toggle {
 }
 
 .remember-toggle input:checked {
-  background: rgba(243, 241, 235, 0.14);
-  border-color: var(--line-strong);
+  background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+  border-color: transparent;
 }
 
 .remember-toggle input:checked::before {
@@ -149,10 +164,12 @@ html.pwa-standalone .remember-toggle {
   border-radius: 14px;
   background: var(--fill);
   overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .field:focus-within {
   border-color: var(--line-strong);
+  box-shadow: 0 0 0 1px var(--accent-glow);
 }
 
 .field input {
@@ -248,7 +265,7 @@ input::placeholder {
 }
 
 .menu-list button:hover {
-  background: rgba(243, 241, 235, 0.06);
+  background: var(--accent-fill);
 }
 
 .error {
@@ -287,28 +304,85 @@ input::placeholder {
   cursor: default;
 }
 
-.icon-btn {
+.copy-btn {
   flex: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.75rem;
+  gap: 0.35rem;
+  min-width: 2.75rem;
   height: 2.75rem;
+  padding: 0 0.7rem;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: transparent;
   color: var(--text);
   cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    min-width 0.18s ease;
 }
 
-.icon-btn:hover,
-.icon-btn:focus-visible {
+.copy-btn:hover:not(.is-copied),
+.copy-btn:focus-visible:not(.is-copied) {
   border-color: var(--line-strong);
+  background: var(--accent-fill);
 }
 
-.icon-btn svg {
+.copy-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-btn__icon svg {
   width: 1.15rem;
   height: 1.15rem;
+}
+
+.copy-btn__done {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.copy-btn__done svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex: none;
+}
+
+.copy-btn__label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  background: linear-gradient(135deg, var(--accent-copy-start), var(--accent-copy-end));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.copy-btn.is-copied {
+  border-color: transparent;
+  background: transparent;
+  cursor: default;
+  padding: 0 0.35rem;
+  min-width: auto;
+}
+
+.copy-btn.is-copied .copy-btn__icon {
+  display: none;
+}
+
+.copy-btn.is-copied .copy-btn__done {
+  display: inline-flex;
 }
 
 .fine {
@@ -320,31 +394,9 @@ input::placeholder {
   padding: 0 max(1.25rem, env(safe-area-inset-right, 0px))
     0 max(1.25rem, env(safe-area-inset-left, 0px));
   text-align: center;
-  color: rgba(243, 241, 235, 0.26);
+  color: rgba(163, 158, 181, 0.38);
   font-size: 0.72rem;
   pointer-events: none;
-}
-
-.toast {
-  position: fixed;
-  left: 50%;
-  bottom: calc(1.15rem + env(safe-area-inset-bottom, 0px));
-  z-index: 2;
-  transform: translateX(-50%) translateY(6px);
-  opacity: 0;
-  pointer-events: none;
-  padding: 0.55rem 0.8rem;
-  border-radius: 999px;
-  background: var(--text);
-  color: var(--bg);
-  font-size: 0.82rem;
-  letter-spacing: 0.01em;
-  transition: opacity 0.18s ease, transform 0.18s ease;
-}
-
-.toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
 }
 
 button:focus-visible,
@@ -353,7 +405,7 @@ input:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .toast {
+  .copy-btn {
     transition: none;
   }
 }
