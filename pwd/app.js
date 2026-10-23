@@ -303,6 +303,7 @@ function scheduleCopyAfterIdle() {
 }
 
 function onCredentialsInput() {
+  clearCopiedFeedback();
   scheduleCopyAfterIdle();
   void generate({ commit: false, copy: false });
 }
@@ -425,10 +426,17 @@ function showCopiedFeedback() {
   copyDoneEl.hidden = false;
   window.clearTimeout(copiedFeedbackTimer);
   copiedFeedbackTimer = window.setTimeout(() => {
-    copyButton.classList.remove("is-copied");
-    copyButton.setAttribute("aria-label", "Copy password");
-    copyDoneEl.hidden = true;
+    clearCopiedFeedback();
   }, 5000);
+}
+
+function clearCopiedFeedback() {
+  if (!copyButton.classList.contains("is-copied")) return;
+  window.clearTimeout(copiedFeedbackTimer);
+  copiedFeedbackTimer = 0;
+  copyButton.classList.remove("is-copied");
+  copyButton.setAttribute("aria-label", "Copy password");
+  copyDoneEl.hidden = true;
 }
 
 async function writeClipboard(text) {
