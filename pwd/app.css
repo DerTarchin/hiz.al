@@ -452,13 +452,17 @@ html.passphrase-locked.passphrase-sealed #phrase {
   gap: 0.35rem;
   margin-top: 1.6rem;
   padding-top: 0.2rem;
+  min-height: 2.75rem;
 }
 
 .password {
   flex: 1;
   min-width: 0;
+  min-height: 2.75rem;
   margin: 0;
   padding-left: 1rem;
+  display: flex;
+  align-items: center;
   font-family: var(--mono);
   font-size: 1.12rem;
   letter-spacing: 0.03em;
@@ -469,12 +473,72 @@ html.passphrase-locked.passphrase-sealed #phrase {
 }
 
 .password.pending {
-  color: var(--muted);
-  font-family: var(--font);
-  font-size: 0.95rem;
-  letter-spacing: 0;
   user-select: none;
   cursor: default;
+}
+
+.password.is-deriving {
+  color: transparent;
+}
+
+.password.is-deriving::after {
+  content: "4OgGaXhClhlF4rAmS";
+  color: var(--muted);
+  animation: pwd-matrix-chars 1s linear infinite;
+}
+
+@keyframes pwd-matrix-chars {
+  0% { content: "4OgGaXhClhlF4rAmS"; }
+  5% { content: "vpslA7gfm0oPTCy6l"; }
+  10% { content: "rTiK0RW75cNHWhvEe"; }
+  15% { content: "ony3XE10U5FoacyxK"; }
+  20% { content: "mychTyTt4UuHscHOq"; }
+  25% { content: "b6LNL4QlTowLEXTxQ"; }
+  30% { content: "Bu7dP5bZDWj!UAxRo"; }
+  35% { content: "OFGzP0r4C5qTRVEMm"; }
+  40% { content: "0x5pTP5yFCF44ik9v"; }
+  45% { content: "QmuQiXFylmTtVqCOx"; }
+  50% { content: "3AuZlhJYA2fYuo11b"; }
+  55% { content: "vPDkAPj4SrAiBAvqH"; }
+  60% { content: "d1iJwSjO2yic9WRPf"; }
+  65% { content: "!z3X0xYTGjPfLEQ8l"; }
+  70% { content: "CedJ5rX4LtBoQRXHR"; }
+  75% { content: "UUH8BJRtwfJuy1jW4"; }
+  80% { content: "eaX8bAXpvyyYZ9yM4"; }
+  85% { content: "QCeBF!GrWZc7KDo4S"; }
+  90% { content: "dqEy2js7yTcJzAur5"; }
+  95% { content: "MXTHqhFxigYzM8kbf"; }
+  100% { content: "4OgGaXhClhlF4rAmS"; }
+}
+
+.password.pending.matrix {
+  font-family: var(--mono);
+  font-size: 1.12rem;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+}
+
+@keyframes pwd-matrix-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.password.pending.matrix.matrix-shimmer {
+  color: transparent;
+  background: linear-gradient(
+    90deg,
+    var(--muted) 0%,
+    rgba(200, 212, 248, 0.92) 50%,
+    var(--muted) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: pwd-matrix-shimmer 0.4s linear infinite;
 }
 
 .password.locked {
@@ -513,8 +577,14 @@ html.passphrase-locked.passphrase-sealed #phrase {
     min-width 0.18s ease;
 }
 
-.copy-btn:hover:not(.is-copied),
-.copy-btn:focus-visible:not(.is-copied) {
+.copy-btn:disabled {
+  opacity: 0.42;
+  cursor: default;
+  pointer-events: none;
+}
+
+.copy-btn:hover:not(:disabled):not(.is-copied),
+.copy-btn:focus-visible:not(:disabled):not(.is-copied) {
   border-color: var(--line-strong);
   background: var(--accent-fill);
 }

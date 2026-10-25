@@ -63,7 +63,7 @@ let pinned = null;
 let busy = false;
 let copiedFeedbackTimer = 0;
 let copyDebounceTimer = 0;
-let phraseDeriveTimer = 0;
+let idleGenerateTimer = 0;
 let pendingDerive = null;
 let copyWhenReady = false;
 let generateSerial = 0;
@@ -73,6 +73,13 @@ let pendingAutoCopyText = "";
 const COPY_IDLE_MS = 500;
 let dismissedExactKey = null;
 let suppressSiteBlurCommit = false;
+/** Version chosen before a site row exists; applied on first generate for that site. */
+let pendingSiteVersion = null;
+let kdfWorker = null;
+let kdfRequestId = 0;
+let kdfWorkerDisabled = false;
+const KDF_WORKER_TIMEOUT_MS = 12_000;
+const KDF_WORKER_PROBE_MS = 2_500;
 
 function rememberEnabled() {
   return document.documentElement.classList.contains("pwa-standalone")
@@ -174,16 +181,12 @@ phraseInput.addEventListener("input", () => {
   syncPassphrasePlaceholder();
   clearCopiedFeedback();
   flushPendingAutoCopy();
-  // Argon2id at 64 MiB takes a noticeable moment; derive once typing pauses.
-  window.clearTimeout(phraseDeriveTimer);
-  phraseDeriveTimer = window.setTimeout(() => {
-    scheduleCopyAfterIdle();
-    void generate({ commit: false, copy: false });
-  }, PHRASE_IDLE_MS);
+  scheduleIdleGenerate();
+  scheduleCopyAfterIdle();
 });
 
 phraseInput.addEventListener("blur", () => {
-  window.clearTimeout(phraseDeriveTimer);
+  window.clearTimeout(idleGenerateTimer);
   void onCredentialsCommit(null, { implicit: true });
 });
 
@@ -304,6 +307,7 @@ async function boot() {
   // The embedded catalog is already in place; the refresh can take seconds on
   // a slow network, and nothing below should wait for it.
   void loadSiteCatalog().catch(() => {});
+  await probeKdfWorker();
   const standalone = document.documentElement.classList.contains("pwa-standalone");
   try {
     const userId = await readStored(PASSKEY_USER);
@@ -500,12 +504,13 @@ function installDeferredAutoCopyFlush() {
 function onCredentialsInput() {
   clearCopiedFeedback();
   flushPendingAutoCopy();
+  scheduleIdleGenerate();
   scheduleCopyAfterIdle();
-  void generate({ commit: false, copy: false });
 }
 
 async function onCredentialsCommit(explicitRow = null, { implicit = false } = {}) {
   window.clearTimeout(copyDebounceTimer);
+  window.clearTimeout(idleGenerateTimer);
   const row = explicitRow ?? (implicit ? rowForImplicitCommit() : rowForExplicitCommit());
   if (!row) {
     if (implicit && readyToGenerate()) {
@@ -523,12 +528,54 @@ async function onCredentialsCommit(explicitRow = null, { implicit = false } = {}
   await generate({ commit: false, copy: true });
 }
 
+function syncCopyButton() {
+  const show = !result.hidden;
+  copyButton.hidden = !show;
+  const enabled =
+    show &&
+    Boolean(passwordText) &&
+    !passwordEl.classList.contains("pending") &&
+    !passwordEl.classList.contains("locked");
+  copyButton.disabled = !enabled;
+  copyButton.setAttribute("aria-disabled", enabled ? "false" : "true");
+}
+
+function showPasswordLoading() {
+  result.hidden = false;
+  setLockedResult(false);
+  if (passwordEl.classList.contains("is-deriving")) return;
+  passwordText = "";
+  passwordEl.textContent = "";
+  passwordEl.classList.remove("matrix", "matrix-shimmer");
+  passwordEl.classList.add("pending", "is-deriving");
+  syncCopyButton();
+}
+
+function clearPasswordLoading() {
+  passwordEl.classList.remove("pending", "is-deriving", "matrix", "matrix-shimmer");
+}
+
+/** Drop the previous password immediately, then derive once typing pauses. */
+function scheduleIdleGenerate() {
+  window.clearTimeout(idleGenerateTimer);
+  generateSerial += 1;
+  if (!readyToGenerate() || keyIsLocked()) {
+    clearPasswordOutput();
+    return;
+  }
+  showPasswordLoading();
+  idleGenerateTimer = window.setTimeout(() => {
+    void generate({ commit: false, copy: false });
+  }, PHRASE_IDLE_MS);
+}
+
 function clearPasswordOutput() {
+  window.clearTimeout(idleGenerateTimer);
+  clearPasswordLoading();
   copyWhenReady = false;
   passwordText = "";
   lastAutoCopiedPassword = "";
   pendingAutoCopyText = "";
-  copyButton.hidden = true;
   if (keyIsLocked()) {
     result.hidden = false;
     setLockedResult(true);
@@ -539,6 +586,7 @@ function clearPasswordOutput() {
   if (passwordEl.classList.contains("locked")) passwordEl.textContent = "";
   setLockedResult(false);
   result.hidden = true;
+  syncCopyButton();
 }
 
 function setLockedResult(locked) {
@@ -555,6 +603,7 @@ function setLockedResult(locked) {
 async function generate({ commit = false, copy = false } = {}) {
   if (!readyToGenerate() || keyIsLocked()) {
     window.clearTimeout(copyDebounceTimer);
+    window.clearTimeout(idleGenerateTimer);
     clearPasswordOutput();
     return;
   }
@@ -570,26 +619,19 @@ async function generate({ commit = false, copy = false } = {}) {
   const serial = ++generateSerial;
   busy = true;
   form.setAttribute("aria-busy", "true");
-  const needsKdf = Boolean(phraseInput.value) && phraseInput.value.normalize("NFC") !== sessionPhrase;
-  if (needsKdf) {
-    result.hidden = false;
-    setLockedResult(false);
-    passwordEl.textContent = "Deriving…";
-    passwordEl.classList.add("pending");
-    copyButton.hidden = true;
-    passwordText = "";
-  }
+  showPasswordLoading();
   try {
     const master = await masterKey();
     if (serial !== generateSerial) return;
+    commitPendingSiteVersion(row.key);
     const password = await passwordFromMaster(master, row.key, siteVersion(row.key));
     if (serial !== generateSerial) return;
     passwordText = password;
     result.hidden = false;
     setLockedResult(false);
     passwordEl.textContent = password;
-    passwordEl.classList.remove("pending");
-    copyButton.hidden = false;
+    clearPasswordLoading();
+    syncCopyButton();
     if (copy || copyWhenReady) {
       copyWhenReady = false;
       await autoCopyPassword(password);
@@ -626,9 +668,98 @@ async function masterKey() {
   throw new Error("Enter a passphrase first.");
 }
 
+function disableKdfWorker() {
+  kdfWorkerDisabled = true;
+  if (kdfWorker) {
+    kdfWorker.terminate();
+    kdfWorker = null;
+  }
+}
+
+function ensureKdfWorker() {
+  if (!kdfWorker) {
+    kdfWorker = new Worker(new URL("./kdf-worker.js", import.meta.url));
+  }
+  return kdfWorker;
+}
+
+function probeKdfWorker() {
+  if (typeof Worker === "undefined" || kdfWorkerDisabled) return Promise.resolve();
+  return new Promise((resolve) => {
+    const worker = ensureKdfWorker();
+    const id = ++kdfRequestId;
+    const cleanup = () => {
+      clearTimeout(timer);
+      worker.removeEventListener("message", onMessage);
+      worker.removeEventListener("error", onError);
+    };
+    const timer = window.setTimeout(() => {
+      cleanup();
+      disableKdfWorker();
+      resolve();
+    }, KDF_WORKER_PROBE_MS);
+    const onMessage = (event) => {
+      if (event.data?.id !== id || !event.data.probe) return;
+      cleanup();
+      resolve();
+    };
+    const onError = () => {
+      cleanup();
+      disableKdfWorker();
+      resolve();
+    };
+    worker.addEventListener("message", onMessage);
+    worker.addEventListener("error", onError);
+    worker.postMessage({ id, probe: true });
+  });
+}
+
+function deriveMasterKeyViaWorker(phrase) {
+  const worker = ensureKdfWorker();
+  const id = ++kdfRequestId;
+  return new Promise((resolve, reject) => {
+    const cleanup = () => {
+      clearTimeout(timer);
+      worker.removeEventListener("message", onMessage);
+      worker.removeEventListener("error", onError);
+    };
+    const timer = window.setTimeout(() => {
+      cleanup();
+      reject(new Error("KDF worker timeout"));
+    }, KDF_WORKER_TIMEOUT_MS);
+    const onMessage = (event) => {
+      if (event.data?.id !== id) return;
+      cleanup();
+      if (event.data.ok) resolve(new Uint8Array(event.data.key));
+      else reject(new Error(event.data.error || "KDF failed"));
+    };
+    const onError = () => {
+      cleanup();
+      reject(new Error("KDF worker failed"));
+    };
+    worker.addEventListener("message", onMessage);
+    worker.addEventListener("error", onError);
+    worker.postMessage({ id, phrase });
+  });
+}
+
+async function deriveMasterKeyOffthread(phrase) {
+  if (typeof Worker === "undefined" || kdfWorkerDisabled) {
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    return deriveMasterKey(phrase);
+  }
+  try {
+    return await deriveMasterKeyViaWorker(phrase);
+  } catch {
+    disableKdfWorker();
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    return deriveMasterKey(phrase);
+  }
+}
+
 /** One Argon2id run per phrase; callers asking for the same phrase share it. */
 async function deriveSessionKey(phrase) {
-  const derived = await deriveMasterKey(phrase);
+  const derived = await deriveMasterKeyOffthread(phrase);
   wipe(sessionKey);
   sessionKey = derived;
   sessionPhrase = phrase;
@@ -943,21 +1074,37 @@ function activeSiteKey() {
   return rowForInput(siteInput.value)?.key ?? null;
 }
 
+function versionNoteText(version) {
+  if (version === 1) return "current";
+  if (version === 2) return "alternative";
+  return "";
+}
+
+function displayedSiteVersion(key) {
+  if (key) return siteVersion(key);
+  return pendingSiteVersion ?? DEFAULT_SITE_VERSION;
+}
+
+function commitPendingSiteVersion(key) {
+  if (!key || pendingSiteVersion === null) return;
+  setSiteVersion(key, pendingSiteVersion);
+  pendingSiteVersion = null;
+}
+
 function renderVersion() {
   const key = activeSiteKey();
-  const version = siteVersion(key);
+  const version = displayedSiteVersion(key);
   versionBtn.textContent = `v${version}`;
-  versionBtn.disabled = !key;
+  versionBtn.disabled = false;
   versionBtn.setAttribute("aria-label", `Password version ${version}`);
-  if (!key) closeVersionMenu();
 }
 
 function openVersionMenu() {
   const key = activeSiteKey();
-  if (!key) return;
-  const current = siteVersion(key);
+  const current = displayedSiteVersion(key);
+  const maxVersion = Math.max(2, current + 1);
   versionMenu.replaceChildren();
-  for (let version = 1; version <= current + 1; version += 1) {
+  for (let version = 1; version <= maxVersion; version += 1) {
     const item = document.createElement("li");
     item.setAttribute("role", "presentation");
     const option = document.createElement("button");
@@ -967,14 +1114,14 @@ function openVersionMenu() {
     const label = document.createElement("span");
     label.textContent = `v${version}`;
     option.append(label);
-    const noteText = version === current ? "current" : version === current + 1 ? "new" : "";
+    const noteText = versionNoteText(version);
     if (noteText) {
       const note = document.createElement("span");
       note.className = "version-note";
       note.textContent = noteText;
       option.append(note);
     }
-    option.addEventListener("click", () => chooseVersion(key, version));
+    option.addEventListener("click", () => chooseVersion(version));
     item.append(option);
     versionMenu.append(item);
   }
@@ -988,12 +1135,18 @@ function closeVersionMenu() {
   versionBtn.setAttribute("aria-expanded", "false");
 }
 
-function chooseVersion(key, version) {
+function chooseVersion(version) {
   closeVersionMenu();
-  if (activeSiteKey() !== key) return;
-  if (version !== siteVersion(key)) setSiteVersion(key, version);
+  const key = activeSiteKey();
+  if (key) {
+    if (version !== siteVersion(key)) setSiteVersion(key, version);
+    pendingSiteVersion = null;
+  } else {
+    pendingSiteVersion = version;
+  }
   renderVersion();
   window.clearTimeout(copyDebounceTimer);
+  window.clearTimeout(idleGenerateTimer);
   void generate({ commit: false, copy: true });
 }
 
@@ -1017,7 +1170,7 @@ versionMenu.addEventListener("keydown", (event) => {
 });
 
 versionBtn.addEventListener("keydown", (event) => {
-  if (event.key !== "ArrowDown" || versionBtn.disabled) return;
+  if (event.key !== "ArrowDown") return;
   event.preventDefault();
   openVersionMenu();
   versionMenu.querySelector('[aria-selected="true"]')?.focus();

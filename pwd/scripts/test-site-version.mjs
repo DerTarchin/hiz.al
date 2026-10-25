@@ -84,7 +84,10 @@ const menuItems = () => page.evaluate(() => [...document.querySelectorAll("#vers
 
 console.log("Layout");
 await load();
-check(await label() === "v1" && await page.locator("#version").isDisabled(), "shows v1, disabled until a site is entered");
+check(await label() === "v1" && !(await page.locator("#version").isDisabled()), "shows v1 and stays enabled before a site is entered");
+await page.click("#version");
+check(JSON.stringify(await menuItems()) === JSON.stringify(["v1current*", "v2alternative"]), `v1/v2 menu without site (${(await menuItems()).join(", ")})`);
+await page.mouse.click(5, 5);
 const styles = await page.evaluate(() => {
   const pick = (el) => {
     const s = getComputedStyle(el);
@@ -118,7 +121,7 @@ check(await label() === "v1" && !(await page.locator("#version").isDisabled()), 
 
 console.log("Dropdown");
 await page.click("#version");
-check(JSON.stringify(await menuItems()) === JSON.stringify(["v1current*", "v2new"]), `lists current and next (${(await menuItems()).join(", ")})`);
+check(JSON.stringify(await menuItems()) === JSON.stringify(["v1current*", "v2alternative"]), `lists v1 current and v2 alt (${(await menuItems()).join(", ")})`);
 if (process.env.SHOT_DIR) await page.screenshot({ path: `${process.env.SHOT_DIR}/version-menu.png` });
 await page.locator("#version-menu button").nth(1).click();
 check(await waitForPassword(AMAZON_V2) === AMAZON_V2, "choosing v2 gives the v2 password");
@@ -132,7 +135,7 @@ await setPhrase("test-passphrase");
 await setSite("amazon");
 check(await waitForPassword(AMAZON_V2) === AMAZON_V2 && await label() === "v2", "amazon is still v2 after reload");
 await page.click("#version");
-check(JSON.stringify(await menuItems()) === JSON.stringify(["v1", "v2current*", "v3new"]), `menu grows by one (${(await menuItems()).join(", ")})`);
+check(JSON.stringify(await menuItems()) === JSON.stringify(["v1current", "v2alternative*", "v3"]), `menu grows by one (${(await menuItems()).join(", ")})`);
 await page.mouse.click(5, 5);
 check(await page.locator("#version-menu").isHidden(), "clicking outside closes the menu");
 await page.click("#version");

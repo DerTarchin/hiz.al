@@ -1,4 +1,4 @@
-const CACHE = "pwd-shell-45";
+const CACHE = "pwd-shell-48";
 const NETWORK_TIMEOUT_MS = 2500;
 
 const SPLASH_SIZES = [
@@ -18,6 +18,8 @@ const ASSETS = [
   "./catalog.json",
   "./catalog.json.gz",
   "./argon2.js",
+  "./kdf-worker.js",
+  "./matrix-loading.js",
   "./manifest.json",
   "./favicon.ico",
   "./icon-192.png",
