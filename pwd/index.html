@@ -134,7 +134,22 @@
         >
       </div>
 
-      <label class="lbl site-label" for="site">Site</label>
+      <div class="site-head">
+        <label class="lbl site-label" for="site">Site</label>
+        <div class="version-picker" id="version-picker">
+          <button
+            class="version-btn"
+            id="version"
+            type="button"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-controls="version-menu"
+            aria-label="Password version 1"
+            disabled
+          >v1</button>
+          <ul class="version-menu" id="version-menu" role="listbox" aria-label="Password version" hidden></ul>
+        </div>
+      </div>
       <div class="field field-site" id="site-field">
         <div class="field-site-input-wrap">
           <input

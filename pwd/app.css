@@ -166,6 +166,97 @@ html.pwa-standalone .remember-toggle {
   margin-top: 1.35rem;
 }
 
+.site-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 1.35rem 0 0.4rem;
+}
+
+.site-head .site-label {
+  margin: 0;
+}
+
+.version-picker {
+  position: relative;
+  flex: none;
+}
+
+.version-btn {
+  display: block;
+  margin: 0;
+  padding: 0.15rem 1rem 0.15rem 0.6rem;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: inherit;
+  cursor: pointer;
+}
+
+.version-btn:disabled {
+  cursor: default;
+}
+
+.version-btn:not(:disabled):hover,
+.version-btn:focus-visible,
+.version-btn[aria-expanded="true"] {
+  color: var(--text);
+  outline: none;
+}
+
+.version-menu {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  right: 0.35rem;
+  z-index: 20;
+  min-width: 8.5rem;
+  margin: 0;
+  padding: 0.3rem 0;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: linear-gradient(var(--fill), var(--fill)), var(--bg);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+.version-menu button {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.5rem 0.95rem;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.version-menu button:hover,
+.version-menu button:focus-visible {
+  background: var(--surface-hover);
+  outline: none;
+}
+
+.version-menu button[aria-selected="true"] {
+  background: var(--selected);
+}
+
+.version-note {
+  color: var(--muted-faint);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
 .field {
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -384,6 +475,16 @@ html.passphrase-locked.passphrase-sealed #phrase {
   letter-spacing: 0;
   user-select: none;
   cursor: default;
+}
+
+.password.locked {
+  color: var(--text);
+  cursor: pointer;
+  outline: none;
+}
+
+.password.locked:focus-visible {
+  text-decoration: underline;
 }
 
 .copy-btn {

@@ -82,9 +82,9 @@ async function openApp({ hasPrf = true, stripCreatePrf = false } = {}) {
     };
     navigator.credentials.get = async (options) => {
       calls.get += 1;
-      if (window.__cancelNextGet) {
+      if (sessionStorage.getItem("cancelNextGet")) {
         // What Safari reports when the user dismisses Face ID.
-        window.__cancelNextGet = false;
+        sessionStorage.removeItem("cancelNextGet");
         throw new DOMException("The operation was not allowed.", "NotAllowedError");
       }
       return get(options);
@@ -120,9 +120,12 @@ async function openApp({ hasPrf = true, stripCreatePrf = false } = {}) {
       await page.waitForTimeout(400);
     },
     calls: () => page.evaluate(() => ({ ...window.__webauthn })),
-    cancelNextPrompt: () => page.evaluate(() => {
-      window.__cancelNextGet = true;
-    }),
+    // Survives a reload, so it can cancel the launch prompt.
+    cancelNextPrompt: () => page.evaluate(() => sessionStorage.setItem("cancelNextGet", "1")),
+    async settle() {
+      await page.waitForFunction(() => document.querySelector("#password").textContent !== "Unlocking…", null, { timeout: 30000 });
+      await page.waitForTimeout(200);
+    },
     async credentialCount() {
       const { credentials } = await cdp.send("WebAuthn.getCredentials", { authenticatorId });
       return credentials.length;
@@ -169,6 +172,7 @@ async function openApp({ hasPrf = true, stripCreatePrf = false } = {}) {
       sealed: document.documentElement.classList.contains("passphrase-sealed"),
       resultHidden: document.querySelector("#result").hidden,
       passwordText: document.querySelector("#password").textContent,
+      resultLocked: document.querySelector("#password").classList.contains("locked"),
     })),
     record: () => page.evaluate(() => new Promise((resolve, reject) => {
       const open = indexedDB.open("hiz-pwd", 1);
@@ -188,8 +192,10 @@ async function openApp({ hasPrf = true, stripCreatePrf = false } = {}) {
           resolve({
             keys: Object.keys(value).sort().join(","),
             v: value.v ?? null,
+            format: value.format ?? null,
             hasCryptoKey: Object.values(value).some((item) => item instanceof CryptoKey),
             ctLength: value.ct?.byteLength ?? 0,
+            credentialIdLength: value.credentialId?.byteLength ?? 0,
           });
         };
       };
@@ -236,62 +242,67 @@ calls = await a.calls();
 check(calls.create === 1, `one passkey created (create=${calls.create}, get=${calls.get})`);
 check(await a.credentialCount() === 1, "authenticator holds one passkey");
 let record = await a.record();
-check(record?.v === 2 && record.ctLength === 48, `v2 record with sealed key (${JSON.stringify(record)})`);
+check(record?.v === 2 && record.format === 2 && record.ctLength === 48, `v2 record with sealed key (${JSON.stringify(record)})`);
 check(record && !record.hasCryptoKey, "no AES key stored next to the ciphertext");
 let state = await a.state();
 check(state.remember && state.phraseValue === "", "remember on and passphrase field cleared");
 check(state.locked && !state.sealed, "field shows saved-and-unlocked state");
 
-console.log("C. Relaunch with Remember: no prompt at launch, one prompt on use");
+console.log("C. Relaunch with Remember: one Face ID prompt at launch, none while typing");
 await a.reload();
-await a.page.waitForTimeout(800);
+await a.settle();
 calls = await a.calls();
-check(calls.create === 0 && calls.get === 0, `no Face ID prompt at launch (get=${calls.get})`);
+check(calls.get === 1 && calls.create === 0, `one prompt at launch (get=${calls.get})`);
 state = await a.state();
-check(state.remember && state.placeholder === "Saved · tap to unlock", `locked placeholder ("${state.placeholder}")`);
-check(state.locked && state.sealed, "field is locked and sealed");
+check(state.placeholder === "Saved on this device" && !state.sealed, `unlocked at launch ("${state.placeholder}")`);
+check(state.resultHidden, "password area stays empty until a site is typed");
 await a.typeSite("amazon");
 check((await a.password()) === expected, "unlocked key yields the same password");
-calls = await a.calls();
-check(calls.get === 1, `exactly one unlock prompt while typing a whole site name (get=${calls.get})`);
 await a.typeSite("chase");
 await a.password();
 calls = await a.calls();
-check(calls.get === 1, "no further prompts after unlocking");
-state = await a.state();
-check(state.placeholder === "Saved on this device" && !state.sealed, "placeholder shows unlocked");
+check(calls.get === 1, `typing sites never prompts (get=${calls.get})`);
 
-console.log("D. Back from background: re-lock only after a minute");
+console.log("D. Re-lock after a minute away: password area says Tap to unlock");
+await a.typeSite("amazon");
+await a.password();
 await a.background(20 * 1000);
 state = await a.state();
-check(!state.resultHidden, "20 seconds away keeps the key unlocked");
+check(!state.resultHidden && !state.resultLocked, "20 seconds away keeps the key unlocked");
 await a.background(61 * 1000);
 state = await a.state();
-check(state.resultHidden && state.passwordText === "" && state.sealed, "61 seconds away re-locks and hides the password");
-await a.typeSite("amazon");
-check((await a.password()) === expected, "unlocks again on next use");
-calls = await a.calls();
-check(calls.get === 2, `second unlock prompt after re-lock (get=${calls.get})`);
-
-console.log("E. Cancelled Face ID: no re-prompt per keystroke, tap to retry");
-await a.reload();
-await a.cancelNextPrompt();
-await a.typeSite("amazon");
-await a.page.waitForFunction(() => !document.querySelector("#error").hidden, null, { timeout: 30000 });
-check((await a.error()).includes("Tap the passphrase field"), `cancel shows retry hint ("${await a.error()}")`);
-calls = await a.calls();
-const afterCancel = calls.get;
-check(afterCancel === 1, `one prompt before cancel (get=${afterCancel})`);
+check(!state.resultHidden && state.resultLocked && state.passwordText === "Tap to unlock",
+  `61 seconds away re-locks ("${state.passwordText}")`);
+check(state.sealed && state.placeholder === "Saved · tap to unlock", "passphrase field shows locked too");
 await a.typeSite("chase");
-await a.page.waitForTimeout(300);
+await a.page.waitForTimeout(400);
+state = await a.state();
 calls = await a.calls();
-check(calls.get === afterCancel, "typing after cancel does not prompt again");
+check(calls.get === 1 && state.passwordText === "Tap to unlock", `typing while locked does not prompt (get=${calls.get})`);
+await a.page.click("#password");
+await a.typeSite("amazon");
+check((await a.password()) === expected, "tapping the password area unlocks and generates");
+calls = await a.calls();
+check(calls.get === 2, `exactly one prompt for the tap (get=${calls.get})`);
+
+console.log("E. Launch prompt cancelled: Tap to unlock, no error, no prompts while typing");
+await a.cancelNextPrompt();
+await a.reload();
+await a.settle();
+state = await a.state();
+calls = await a.calls();
+check(calls.get === 1, `launch prompt was shown once (get=${calls.get})`);
+check(!state.resultHidden && state.resultLocked && state.passwordText === "Tap to unlock", `password area says "${state.passwordText}"`);
+check((await a.error()) === "", "cancel shows no error");
+await a.typeSite("amazon");
+await a.page.waitForTimeout(400);
+calls = await a.calls();
+check(calls.get === 1 && (await a.state()).passwordText === "Tap to unlock", "typing after cancel does not prompt");
 check((await a.record())?.ctLength === 48, "cancel keeps the saved key");
 await a.page.click("#phrase-field");
-const afterTap = await a.password();
+check((await a.password()) === expected, "tapping the passphrase field unlocks and generates");
 calls = await a.calls();
-check(calls.get === afterCancel + 1, `tapping the passphrase field prompts once (get=${calls.get})`);
-check(afterTap.length === 17 && (await a.error()) === "", "tap unlock generates and clears the error");
+check(calls.get === 2, `one prompt for the tap (get=${calls.get})`);
 
 console.log("F. Turn Remember off: no prompt, record removed");
 const before = await a.calls();
@@ -388,6 +399,48 @@ check(await j.record() === null, "legacy record deleted");
 check(!state.remember && calls.get === 0, "remember off, no prompt");
 check((await j.error()).includes("Turn it on again"), `notice shown ("${await j.error()}")`);
 await j.close();
+
+console.log("K. Key saved under the old password format: passkey kept, key re-saved");
+const k = await openApp();
+await k.load();
+await k.setPhrase(PHRASE);
+await k.typeSite("amazon");
+await k.password();
+await k.page.click("#remember");
+await k.page.waitForFunction(() => document.querySelector("#phrase").placeholder === "Saved on this device", null, { timeout: 10000 });
+await k.page.evaluate(() => new Promise((resolve, reject) => {
+  const open = indexedDB.open("hiz-pwd", 1);
+  open.onerror = () => reject(open.error);
+  open.onsuccess = () => {
+    const db = open.result;
+    const store = db.transaction("vault", "readwrite").objectStore("vault");
+    const get = store.get("device");
+    get.onsuccess = () => {
+      const record = get.result;
+      delete record.format;
+      store.put(record, "device").onsuccess = () => {
+        db.close();
+        resolve();
+      };
+    };
+  };
+}));
+await k.reload();
+state = await k.state();
+calls = await k.calls();
+record = await k.record();
+check(state.remember && record?.ctLength === 0 && record.credentialIdLength !== 0, "stale key dropped, passkey enrollment kept");
+check(calls.get === 0 && calls.create === 0, "no prompt at launch");
+check((await k.error()).includes("new format"), `notice shown ("${await k.error()}")`);
+await k.setPhrase(PHRASE);
+await k.typeSite("amazon");
+check((await k.password()) === expected, "password from the typed passphrase");
+await k.page.waitForFunction(() => document.querySelector("#phrase").value === "", null, { timeout: 10000 });
+calls = await k.calls();
+record = await k.record();
+check(calls.create === 0 && calls.get === 1, `re-saving reuses the passkey with one prompt (create=${calls.create}, get=${calls.get})`);
+check(record?.format === 2 && record.ctLength === 48, "key saved in the new format");
+await k.close();
 
 await browser.close();
 server.close();

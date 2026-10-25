@@ -1,4 +1,10 @@
-import { deriveMasterKey, passwordFromMaster } from "./derive.js";
+import {
+  DEFAULT_SITE_VERSION,
+  FORMAT_VERSION,
+  deriveMasterKey,
+  normalizeSiteVersion,
+  passwordFromMaster,
+} from "./derive.js";
 import { buildMenu, cleanHostInput, loadSiteCatalog, matchHighlightRange, rowForInput } from "./sites.js";
 
 const phraseInput = document.querySelector("#phrase");
@@ -6,6 +12,9 @@ const phraseField = document.querySelector("#phrase-field");
 const siteInput = document.querySelector("#site");
 const siteClearBtn = document.querySelector("#site-clear");
 const siteField = document.querySelector("#site-field");
+const versionPicker = document.querySelector("#version-picker");
+const versionBtn = document.querySelector("#version");
+const versionMenu = document.querySelector("#version-menu");
 const form = document.querySelector("#form");
 const rememberInput = document.querySelector("#remember");
 const menuLabel = document.querySelector("#menu-label");
@@ -20,6 +29,8 @@ const DB_NAME = "hiz-pwd";
 const STORE = "vault";
 const RECORD = "device";
 const PASSKEY_USER = "passkey-user";
+const SITE_VERSIONS_KEY = "hizPwdSiteVersions";
+const PHRASE_IDLE_MS = 250;
 
 /**
  * Remember keeps the Argon2id master key wrapped with AES-GCM. The wrapping
@@ -34,7 +45,8 @@ const RELOCK_AFTER_MS = 60 * 1000;
 const PLACEHOLDER_DEFAULT = "Long memorable phrase";
 const PLACEHOLDER_SAVED = "Saved on this device";
 const PLACEHOLDER_LOCKED = "Saved · tap to unlock";
-const UNLOCK_RETRY_HINT = "Unlock was cancelled. Tap the passphrase field to try again.";
+const LOCKED_TEXT = "Tap to unlock";
+const UNLOCKING_TEXT = "Unlocking…";
 const PRF_UNSUPPORTED = "This device can't lock a remembered passphrase behind Face ID.";
 
 let sessionKey = null;
@@ -44,7 +56,6 @@ let savedRecord = null;
 let passkeyUserId = null;
 let prfWrap = null;
 let unlockPromise = null;
-let unlockDeclined = false;
 let rememberPromise = null;
 let hiddenAt = 0;
 let manualActive = null;
@@ -52,6 +63,9 @@ let pinned = null;
 let busy = false;
 let copiedFeedbackTimer = 0;
 let copyDebounceTimer = 0;
+let phraseDeriveTimer = 0;
+let pendingDerive = null;
+let copyWhenReady = false;
 let generateSerial = 0;
 let passwordText = "";
 let lastAutoCopiedPassword = "";
@@ -78,12 +92,17 @@ function shouldLockPassphrase() {
 }
 
 function hasSavedKey() {
-  return Boolean(savedRecord?.ct);
+  return Boolean(savedRecord?.ct) && savedRecord.format === FORMAT_VERSION;
 }
 
 /** A key is saved on this device but has not been unlocked with Face ID yet. */
 function savedKeyLocked() {
   return hasSavedKey() && !(sessionKey && sessionFromSaved);
+}
+
+/** The only key available is the saved one, and it is still locked. */
+function keyIsLocked() {
+  return !phraseInput.value && !sessionKey && hasSavedKey();
 }
 
 function syncPassphrasePlaceholder() {
@@ -93,6 +112,7 @@ function syncPassphrasePlaceholder() {
 
 function updatePassphraseFieldState() {
   syncPassphrasePlaceholder();
+  syncLockedResult();
   const lock = shouldLockPassphrase();
   document.documentElement.classList.toggle("passphrase-locked", lock);
   document.documentElement.classList.toggle(
@@ -107,6 +127,11 @@ function updatePassphraseFieldState() {
   }
   phraseInput.removeAttribute("aria-disabled");
   if (!phraseInput.value) phraseInput.setAttribute("readonly", "");
+}
+
+/** Shows or clears "Tap to unlock" in the password area. */
+function syncLockedResult() {
+  if (keyIsLocked() || passwordEl.classList.contains("locked")) clearPasswordOutput();
 }
 
 function focusSite() {
@@ -135,16 +160,24 @@ phraseInput.addEventListener("keydown", () => {
 });
 
 phraseField.addEventListener("click", () => {
-  if (phraseInput.value || !savedKeyLocked()) return;
-  void unlockFromTap();
+  if (!keyIsLocked() || unlockPromise) return;
+  void unlockAndGenerate({ copy: true });
 });
 
 phraseInput.addEventListener("input", () => {
   syncPassphrasePlaceholder();
-  onCredentialsInput();
+  clearCopiedFeedback();
+  flushPendingAutoCopy();
+  // Argon2id at 64 MiB takes a noticeable moment; derive once typing pauses.
+  window.clearTimeout(phraseDeriveTimer);
+  phraseDeriveTimer = window.setTimeout(() => {
+    scheduleCopyAfterIdle();
+    void generate({ commit: false, copy: false });
+  }, PHRASE_IDLE_MS);
 });
 
 phraseInput.addEventListener("blur", () => {
+  window.clearTimeout(phraseDeriveTimer);
   void onCredentialsCommit(null, { implicit: true });
 });
 
@@ -233,9 +266,24 @@ function copyPasswordManually() {
   }
 }
 
+function onPasswordTap() {
+  if (passwordEl.classList.contains("locked")) {
+    if (keyIsLocked() && !unlockPromise) void unlockAndGenerate({ copy: true });
+    return;
+  }
+  copyPasswordManually();
+}
+
 copyButton.addEventListener("click", copyPasswordManually);
 
-passwordEl.addEventListener("click", copyPasswordManually);
+passwordEl.addEventListener("click", onPasswordTap);
+
+passwordEl.addEventListener("keydown", (event) => {
+  if (!passwordEl.classList.contains("locked")) return;
+  if (event.key !== "Enter" && event.key !== " ") return;
+  event.preventDefault();
+  onPasswordTap();
+});
 
 installDeferredAutoCopyFlush();
 
@@ -276,10 +324,24 @@ async function boot() {
       showError("Remember now unlocks with Face ID. Turn it on again to save your passphrase.");
     }
   }
+  if (saved?.ct && saved.format !== FORMAT_VERSION) {
+    // Saved under an older password format: keep the passkey, drop the key.
+    saved = { v: saved.v, credentialId: saved.credentialId, prfSalt: saved.prfSalt };
+    try {
+      await writeStored(RECORD, saved);
+    } catch {
+      /* hasSavedKey() ignores the stale key either way */
+    }
+    if (standalone) {
+      showError("Passwords use a new format. Type your passphrase once to save it again.");
+    }
+  }
   savedRecord = saved;
   if (savedRecord && standalone) rememberInput.checked = true;
   updatePassphraseFieldState();
   focusInitial();
+  // A saved passphrase asks for Face ID once at launch. Typing never does.
+  if (keyIsLocked()) void unlockAndGenerate({ copy: false });
 }
 
 window.addEventListener("pageshow", () => {
@@ -306,10 +368,8 @@ function relockIfAway() {
   sessionPhrase = "";
   sessionFromSaved = false;
   prfWrap = null;
-  unlockDeclined = false;
   window.clearTimeout(copyDebounceTimer);
   clearPasswordOutput();
-  passwordEl.textContent = "";
   clearError();
   updatePassphraseFieldState();
 }
@@ -344,17 +404,23 @@ async function onRememberToggle() {
   if (!phraseInput.value) focusInitial();
 }
 
-async function unlockFromTap() {
-  unlockDeclined = false;
+/**
+ * Asks for Face ID, then shows the password for the current site. Starts the
+ * WebAuthn call before any await, so a tap that led here counts as the gesture.
+ */
+async function unlockAndGenerate({ copy }) {
+  const pending = unlockSavedKey();
   clearError();
+  clearPasswordOutput();
   try {
-    await unlockSavedKey();
+    await pending;
   } catch (error) {
-    showError(errorText(error, UNLOCK_RETRY_HINT));
+    if (!error?.cancelled) showError(errorText(error, "Could not unlock the saved passphrase."));
+    clearPasswordOutput();
     return;
   }
-  if (readyToGenerate()) await generate({ commit: false, copy: true });
-  else focusSite();
+  if (readyToGenerate()) await generate({ commit: false, copy });
+  else clearPasswordOutput();
 }
 
 function rowForPinnedCommit() {
@@ -405,7 +471,11 @@ function readyToGenerate() {
 function scheduleCopyAfterIdle() {
   window.clearTimeout(copyDebounceTimer);
   copyDebounceTimer = window.setTimeout(() => {
-    if (!passwordText || passwordEl.classList.contains("pending")) return;
+    if (passwordEl.classList.contains("pending")) {
+      copyWhenReady = true;
+      return;
+    }
+    if (!passwordText) return;
     void performAutoCopy(passwordText);
   }, COPY_IDLE_MS);
 }
@@ -450,15 +520,36 @@ async function onCredentialsCommit(explicitRow = null, { implicit = false } = {}
 }
 
 function clearPasswordOutput() {
+  copyWhenReady = false;
   passwordText = "";
   lastAutoCopiedPassword = "";
   pendingAutoCopyText = "";
-  result.hidden = true;
   copyButton.hidden = true;
+  if (keyIsLocked()) {
+    result.hidden = false;
+    setLockedResult(true);
+    passwordEl.textContent = unlockPromise ? UNLOCKING_TEXT : LOCKED_TEXT;
+    passwordEl.classList.add("pending");
+    return;
+  }
+  if (passwordEl.classList.contains("locked")) passwordEl.textContent = "";
+  setLockedResult(false);
+  result.hidden = true;
+}
+
+function setLockedResult(locked) {
+  passwordEl.classList.toggle("locked", locked);
+  if (locked) {
+    passwordEl.setAttribute("role", "button");
+    passwordEl.tabIndex = 0;
+  } else {
+    passwordEl.removeAttribute("role");
+    passwordEl.removeAttribute("tabindex");
+  }
 }
 
 async function generate({ commit = false, copy = false } = {}) {
-  if (!readyToGenerate()) {
+  if (!readyToGenerate() || keyIsLocked()) {
     window.clearTimeout(copyDebounceTimer);
     clearPasswordOutput();
     return;
@@ -476,10 +567,10 @@ async function generate({ commit = false, copy = false } = {}) {
   busy = true;
   form.setAttribute("aria-busy", "true");
   const needsKdf = Boolean(phraseInput.value) && phraseInput.value.normalize("NFC") !== sessionPhrase;
-  const needsUnlock = !phraseInput.value && !sessionKey && hasSavedKey() && !unlockDeclined;
-  if (needsKdf || needsUnlock) {
+  if (needsKdf) {
     result.hidden = false;
-    passwordEl.textContent = needsKdf ? "Deriving…" : "Unlocking…";
+    setLockedResult(false);
+    passwordEl.textContent = "Deriving…";
     passwordEl.classList.add("pending");
     copyButton.hidden = true;
     passwordText = "";
@@ -487,14 +578,18 @@ async function generate({ commit = false, copy = false } = {}) {
   try {
     const master = await masterKey();
     if (serial !== generateSerial) return;
-    const password = await passwordFromMaster(master, row.key);
+    const password = await passwordFromMaster(master, row.key, siteVersion(row.key));
     if (serial !== generateSerial) return;
     passwordText = password;
     result.hidden = false;
+    setLockedResult(false);
     passwordEl.textContent = password;
     passwordEl.classList.remove("pending");
     copyButton.hidden = false;
-    if (copy) await autoCopyPassword(password);
+    if (copy || copyWhenReady) {
+      copyWhenReady = false;
+      await autoCopyPassword(password);
+    }
   } catch (error) {
     if (serial !== generateSerial) return;
     clearPasswordOutput();
@@ -511,17 +606,31 @@ async function masterKey() {
   const phrase = phraseInput.value.normalize("NFC");
   if (phrase) {
     if (sessionKey && sessionPhrase === phrase) return sessionKey;
-    const derived = await deriveMasterKey(phrase);
-    wipe(sessionKey);
-    sessionKey = derived;
-    sessionPhrase = phrase;
-    sessionFromSaved = false;
-    if (rememberEnabled()) await rememberDerivedKey(derived);
-    return sessionKey;
+    if (pendingDerive?.phrase !== phrase) {
+      const promise = deriveSessionKey(phrase);
+      pendingDerive = { phrase, promise };
+      promise
+        .finally(() => {
+          if (pendingDerive?.promise === promise) pendingDerive = null;
+        })
+        .catch(() => {});
+    }
+    return pendingDerive.promise;
   }
   if (sessionKey) return sessionKey;
-  if (hasSavedKey()) return unlockSavedKey();
+  if (hasSavedKey()) throw new Error(`${LOCKED_TEXT}.`);
   throw new Error("Enter a passphrase first.");
+}
+
+/** One Argon2id run per phrase; callers asking for the same phrase share it. */
+async function deriveSessionKey(phrase) {
+  const derived = await deriveMasterKey(phrase);
+  wipe(sessionKey);
+  sessionKey = derived;
+  sessionPhrase = phrase;
+  sessionFromSaved = false;
+  if (rememberEnabled()) await rememberDerivedKey(derived);
+  return derived;
 }
 
 async function rememberDerivedKey(key) {
@@ -767,6 +876,7 @@ function renderMenu() {
   else siteInput.removeAttribute("aria-activedescendant");
 
   syncSiteClear();
+  renderVersion();
 
   menu.rows.forEach((row, index) => {
     const item = document.createElement("li");
@@ -794,6 +904,124 @@ function renderMenu() {
     menuList.querySelector(`#opt-${menu.active}`)?.scrollIntoView({ block: "nearest" });
   }
 }
+
+function readSiteVersions() {
+  try {
+    const map = JSON.parse(localStorage.getItem(SITE_VERSIONS_KEY) || "{}");
+    return map && typeof map === "object" && !Array.isArray(map) ? map : {};
+  } catch {
+    return {};
+  }
+}
+
+/** Per-site counter. Only sites moved off v1 are stored. */
+function siteVersion(key) {
+  if (!key) return DEFAULT_SITE_VERSION;
+  try {
+    return normalizeSiteVersion(readSiteVersions()[key] ?? DEFAULT_SITE_VERSION);
+  } catch {
+    return DEFAULT_SITE_VERSION;
+  }
+}
+
+function setSiteVersion(key, version) {
+  const map = readSiteVersions();
+  if (version === DEFAULT_SITE_VERSION) delete map[key];
+  else map[key] = version;
+  try {
+    localStorage.setItem(SITE_VERSIONS_KEY, JSON.stringify(map));
+  } catch {
+    showError("Could not save the version on this device.");
+  }
+}
+
+function activeSiteKey() {
+  return rowForInput(siteInput.value)?.key ?? null;
+}
+
+function renderVersion() {
+  const key = activeSiteKey();
+  const version = siteVersion(key);
+  versionBtn.textContent = `v${version}`;
+  versionBtn.disabled = !key;
+  versionBtn.setAttribute("aria-label", `Password version ${version}`);
+  if (!key) closeVersionMenu();
+}
+
+function openVersionMenu() {
+  const key = activeSiteKey();
+  if (!key) return;
+  const current = siteVersion(key);
+  versionMenu.replaceChildren();
+  for (let version = 1; version <= current + 1; version += 1) {
+    const item = document.createElement("li");
+    item.setAttribute("role", "presentation");
+    const option = document.createElement("button");
+    option.type = "button";
+    option.setAttribute("role", "option");
+    option.setAttribute("aria-selected", version === current ? "true" : "false");
+    const label = document.createElement("span");
+    label.textContent = `v${version}`;
+    option.append(label);
+    const noteText = version === current ? "current" : version === current + 1 ? "new" : "";
+    if (noteText) {
+      const note = document.createElement("span");
+      note.className = "version-note";
+      note.textContent = noteText;
+      option.append(note);
+    }
+    option.addEventListener("click", () => chooseVersion(key, version));
+    item.append(option);
+    versionMenu.append(item);
+  }
+  versionMenu.hidden = false;
+  versionBtn.setAttribute("aria-expanded", "true");
+}
+
+function closeVersionMenu() {
+  if (versionMenu.hidden) return;
+  versionMenu.hidden = true;
+  versionBtn.setAttribute("aria-expanded", "false");
+}
+
+function chooseVersion(key, version) {
+  closeVersionMenu();
+  if (activeSiteKey() !== key) return;
+  if (version !== siteVersion(key)) setSiteVersion(key, version);
+  renderVersion();
+  window.clearTimeout(copyDebounceTimer);
+  void generate({ commit: false, copy: true });
+}
+
+versionBtn.addEventListener("click", () => {
+  if (versionMenu.hidden) openVersionMenu();
+  else closeVersionMenu();
+});
+
+versionMenu.addEventListener("keydown", (event) => {
+  const options = [...versionMenu.querySelectorAll("button")];
+  const index = options.indexOf(document.activeElement);
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeVersionMenu();
+    versionBtn.focus();
+  } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+    event.preventDefault();
+    const step = event.key === "ArrowDown" ? 1 : -1;
+    options[(index + step + options.length) % options.length]?.focus();
+  }
+});
+
+versionBtn.addEventListener("keydown", (event) => {
+  if (event.key !== "ArrowDown" || versionBtn.disabled) return;
+  event.preventDefault();
+  openVersionMenu();
+  versionMenu.querySelector('[aria-selected="true"]')?.focus();
+});
+
+document.addEventListener("pointerdown", (event) => {
+  if (!versionPicker.contains(event.target)) closeVersionMenu();
+}, true);
 
 function showError(message) {
   errorEl.hidden = false;
@@ -875,7 +1103,9 @@ async function enableRemember() {
   prfWrap = { credentialId: record.credentialId, key: enrolled.key };
   const phrase = phraseInput.value.normalize("NFC");
   const key = sessionKey && (!phrase || phrase === sessionPhrase) ? sessionKey : null;
-  const next = key ? { ...record, ...(await sealMasterKey(key, enrolled.key)) } : record;
+  const next = key
+    ? { ...record, format: FORMAT_VERSION, ...(await sealMasterKey(key, enrolled.key)) }
+    : record;
   await writeStored(RECORD, next);
   savedRecord = next;
   if (key && sessionKey === key) {
@@ -892,7 +1122,6 @@ async function forgetSavedKey() {
   const record = savedRecord;
   savedRecord = null;
   prfWrap = null;
-  unlockDeclined = false;
   sessionFromSaved = false;
   wipe(sessionKey);
   sessionKey = null;
@@ -918,6 +1147,7 @@ async function saveMasterKey(bytes) {
       v: RECORD_VERSION,
       credentialId: record.credentialId,
       prfSalt: record.prfSalt,
+      format: FORMAT_VERSION,
       ...sealed,
     };
     savedRecord = next;
@@ -931,7 +1161,6 @@ async function saveMasterKey(bytes) {
 /** One Face ID prompt per unlock; concurrent callers share it. */
 function unlockSavedKey() {
   if (unlockPromise) return unlockPromise;
-  if (unlockDeclined) return Promise.reject(new Error(UNLOCK_RETRY_HINT));
   const record = savedRecord;
   unlockPromise = wrapKeyFor(record)
     .then(async (key) => {
@@ -957,12 +1186,6 @@ function unlockSavedKey() {
       sessionFromSaved = true;
       updatePassphraseFieldState();
       return sessionKey;
-    })
-    .catch((error) => {
-      if (!error?.cancelled) throw error;
-      unlockDeclined = true;
-      updatePassphraseFieldState();
-      throw new Error(UNLOCK_RETRY_HINT);
     })
     .finally(() => {
       unlockPromise = null;
