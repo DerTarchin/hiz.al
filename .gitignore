@@ -1,5 +1,6 @@
 # misc
 .DS_Store
+/Icon*
 
 # dependencies
 node_modules/
