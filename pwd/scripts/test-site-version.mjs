@@ -141,6 +141,24 @@ check(await waitForPassword(AMAZON_V1) === AMAZON_V1 && await label() === "v1", 
 const stored = await page.evaluate(() => localStorage.getItem("hizPwdSiteVersions"));
 check(stored === "{}", `v1 is not stored (${stored})`);
 
+console.log("Slow network at launch");
+const slow = await browser.newContext({ viewport: { width: 420, height: 860 }, serviceWorkers: "block" });
+const slowPage = await slow.newPage();
+await slowPage.route(/catalog\.json/, async (route) => {
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+  await route.continue();
+});
+await slowPage.goto(url, { waitUntil: "domcontentloaded" });
+await slowPage.click("#site");
+await slowPage.keyboard.type("amazon", { delay: 400 });
+const typed = await slowPage.evaluate(() => ({
+  site: document.querySelector("#site").value,
+  phrase: document.querySelector("#phrase").value,
+}));
+check(typed.site.toLowerCase() === "amazon" && typed.phrase === "",
+  `focus stays in the site field while the catalog loads (${JSON.stringify(typed)})`);
+await slow.close();
+
 await browser.close();
 server.close();
 if (failures) {

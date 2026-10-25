@@ -143,6 +143,12 @@ function focusInitial() {
   else focusPhrase();
 }
 
+/** True once the user has put focus somewhere other than the initial field. */
+function focusMovedByUser() {
+  const active = document.activeElement;
+  return Boolean(active && active !== document.body && active !== phraseInput);
+}
+
 phraseInput.addEventListener("focus", () => {
   if (!shouldLockPassphrase()) return;
   phraseInput.blur();
@@ -295,11 +301,9 @@ function focusPhrase() {
 }
 
 async function boot() {
-  try {
-    await loadSiteCatalog();
-  } catch {
-    /* embedded catalog stays in place */
-  }
+  // The embedded catalog is already in place; the refresh can take seconds on
+  // a slow network, and nothing below should wait for it.
+  void loadSiteCatalog().catch(() => {});
   const standalone = document.documentElement.classList.contains("pwa-standalone");
   try {
     const userId = await readStored(PASSKEY_USER);
@@ -339,7 +343,7 @@ async function boot() {
   savedRecord = saved;
   if (savedRecord && standalone) rememberInput.checked = true;
   updatePassphraseFieldState();
-  focusInitial();
+  if (!focusMovedByUser()) focusInitial();
   // A saved passphrase asks for Face ID once at launch. Typing never does.
   if (keyIsLocked()) void unlockAndGenerate({ copy: false });
 }
