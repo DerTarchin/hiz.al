@@ -5,6 +5,7 @@ import {
   normalizeSiteVersion,
   passwordFromMaster,
 } from "./derive.js";
+import { mountPassphraseFingerprint } from "./passphrase-fingerprint.js";
 import { buildMenu, cleanHostInput, loadSiteCatalog, matchHighlightRange, rowForInput } from "./sites.js";
 
 const phraseInput = document.querySelector("#phrase");
@@ -24,6 +25,8 @@ const passwordEl = document.querySelector("#password");
 const copyButton = document.querySelector("#copy");
 const copyDoneEl = copyButton.querySelector(".copy-btn__done");
 const errorEl = document.querySelector("#error");
+const passphraseFingerprintEl = document.querySelector("#passphrase-fingerprint");
+const passphraseFingerprint = mountPassphraseFingerprint(passphraseFingerprintEl);
 
 const DB_NAME = "hiz-pwd";
 const STORE = "vault";
@@ -134,6 +137,7 @@ function updatePassphraseFieldState() {
   }
   phraseInput.removeAttribute("aria-disabled");
   if (!phraseInput.value) phraseInput.setAttribute("readonly", "");
+  passphraseFingerprint.update(phraseInput.value);
 }
 
 /** Shows or clears "Tap to unlock" in the password area. */
@@ -181,6 +185,7 @@ phraseInput.addEventListener("input", () => {
   syncPassphrasePlaceholder();
   clearCopiedFeedback();
   flushPendingAutoCopy();
+  passphraseFingerprint.update(phraseInput.value);
   scheduleIdleGenerate();
   scheduleCopyAfterIdle();
 });

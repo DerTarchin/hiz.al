@@ -287,6 +287,14 @@ html.pwa-standalone .remember-toggle {
   box-sizing: border-box;
 }
 
+.phrase-field-input-wrap {
+  position: relative;
+}
+
+.phrase-field-input-wrap input {
+  padding-right: 3.65rem;
+}
+
 .field-site-input-wrap {
   position: relative;
 }
@@ -641,6 +649,21 @@ html.passphrase-locked.passphrase-sealed #phrase {
 
 .copy-btn.is-copied .copy-btn__done {
   display: inline-flex;
+}
+
+.passphrase-fingerprint {
+  position: absolute;
+  top: 50%;
+  right: 0.55rem;
+  display: block;
+  width: 2.5rem;
+  height: 2.5rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+html.passphrase-locked .passphrase-fingerprint {
+  opacity: 0.5;
 }
 
 .fine {
