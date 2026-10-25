@@ -113,6 +113,21 @@ check(styles.site.size === styles.version.size && styles.site.color === styles.v
 check(styles.rightGap > 12 && styles.rightGap < 20, `inset from the form's right edge like the label's left inset (${styles.rightGap.toFixed(1)}px)`);
 check(styles.centerDelta < 1.5, `vertically centered with the Site label (off by ${styles.centerDelta.toFixed(2)}px)`);
 
+console.log("Passphrase field");
+const phraseField = await page.evaluate(() => {
+  const el = document.querySelector("#phrase");
+  return {
+    type: el.type,
+    autocomplete: el.getAttribute("autocomplete"),
+    inForm: Boolean(el.closest("form")),
+    ignoredByExtension: el.hasAttribute("data-hiz-pwd-ignore"),
+  };
+});
+check(phraseField.type === "password" && phraseField.autocomplete === "new-password",
+  `secure-text field with autocomplete="new-password" (${JSON.stringify(phraseField)})`);
+check(!phraseField.inForm, "not inside a <form>");
+check(phraseField.ignoredByExtension, "marked so the Chrome extension skips it");
+
 console.log("Browser matches the pinned vectors");
 await setPhrase("test-passphrase");
 await setSite("amazon");

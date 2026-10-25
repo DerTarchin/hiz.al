@@ -101,7 +101,8 @@
 </head>
 <body>
   <main>
-    <form id="form" autocomplete="off" data-lpignore="true" data-1p-ignore data-bwignore>
+    <!-- Not a <form>: nothing here submits, so password managers have nothing to save. -->
+    <div id="form" data-lpignore="true" data-1p-ignore data-bwignore>
       <div class="phrase-head">
         <label class="lbl" for="phrase">Passphrase</label>
         <label class="remember-toggle" for="remember">
@@ -117,10 +118,8 @@
       <div class="field" id="phrase-field">
         <input
           id="phrase"
-          class="phrase-secret"
-          type="text"
-          inputmode="text"
-          autocomplete="off"
+          type="password"
+          autocomplete="new-password"
           autocapitalize="off"
           autocorrect="off"
           spellcheck="false"
@@ -130,6 +129,7 @@
           data-1p-ignore
           data-lpignore="true"
           data-bwignore
+          data-hiz-pwd-ignore
           readonly
         >
       </div>
@@ -184,7 +184,7 @@
         <ul class="menu-list" id="menu-list" role="listbox"></ul>
       </div>
       <p class="error" id="error" hidden></p>
-    </form>
+    </div>
 
     <div class="result" id="result" hidden>
       <p class="password" id="password" translate="no"></p>

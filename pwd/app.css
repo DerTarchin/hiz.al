@@ -334,11 +334,6 @@ input::placeholder {
   color: var(--muted-ghost);
 }
 
-.phrase-secret {
-  -webkit-text-security: disc;
-  text-security: disc;
-}
-
 html.passphrase-locked #phrase {
   pointer-events: none;
   opacity: 0.5;

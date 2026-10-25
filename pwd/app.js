@@ -257,10 +257,6 @@ siteInput.addEventListener("keydown", (event) => {
   }
 });
 
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
-  void onCredentialsCommit();
-});
 
 form.addEventListener("keydown", (event) => {
   if (event.key !== "Enter" || event.target instanceof HTMLTextAreaElement) return;
