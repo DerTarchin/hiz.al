@@ -57,22 +57,34 @@
       }
     })();
   </script>
+  <!--
+    Fast first visit on a slow connection: fetch every module, the site catalog,
+    and the font in parallel right away, instead of discovering them one import
+    at a time. The service worker registers later, from app.js, once the page
+    is usable.
+  -->
   <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./sw.js").catch(function () {});
+    // First: the Argon2id worker is the longest download chain (worker, then
+    // argon2.js), so start it before anything else.
+    try {
+      window.__hizKdfWorker = new Worker("./kdf-worker.js");
+    } catch (error) {
+      window.__hizKdfWorker = null;
     }
+    // The site catalog, fetched now and picked up by sites.js. (A preload hint
+    // would be downloaded twice by Safari.)
+    window.__hizCatalog = fetch("./catalog.json").then(function (response) {
+      if (!response.ok) throw new Error("Site catalog request failed (" + response.status + ")");
+      return response.json();
+    });
+    window.__hizCatalog.catch(function () {});
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400;500;600&display=swap"
-    rel="stylesheet"
-    media="print"
-    onload="this.media='all'"
-  >
-  <noscript>
-    <link href="https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  </noscript>
+  <link rel="modulepreload" href="./app.js">
+  <link rel="modulepreload" href="./derive.js">
+  <link rel="modulepreload" href="./passphrase-fingerprint.js">
+  <link rel="modulepreload" href="./sites.js">
+  <link rel="modulepreload" href="./site-registry.js">
+  <link rel="preload" href="./fonts/kode-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin fetchpriority="low">
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./favicon.ico" sizes="any">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
@@ -117,19 +129,33 @@
       </div>
       <div class="field" id="phrase-field">
         <div class="phrase-field-input-wrap">
+          <!--
+            A text field, not type="password": password fields make iOS and Chrome
+            offer strong-password and keychain suggestions before you can type.
+            Everything below asks keyboards, autofill, writing tools, and
+            extensions not to suggest, correct, remember, or learn from it.
+          -->
           <input
             id="phrase"
-            type="password"
-            autocomplete="new-password"
+            class="phrase-secret"
+            type="text"
+            inputmode="text"
+            autocomplete="off"
             autocapitalize="off"
             autocorrect="off"
             spellcheck="false"
+            writingsuggestions="false"
+            aria-autocomplete="none"
+            translate="no"
             enterkeyhint="next"
             placeholder="Long memorable phrase"
             data-form-type="other"
             data-1p-ignore
             data-lpignore="true"
             data-bwignore
+            data-gramm="false"
+            data-gramm_editor="false"
+            data-enable-grammarly="false"
             data-hiz-pwd-ignore
             readonly
           >
@@ -256,7 +282,6 @@
     </div>
   </main>
   <p class="fine">Nothing leaves this device.</p>
-  <script src="./argon2.js"></script>
   <script type="module" src="./app.js"></script>
 </body>
 </html>

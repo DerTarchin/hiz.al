@@ -110,13 +110,13 @@ async function openApp({ hasPrf = true, stripCreatePrf = false } = {}) {
     page,
     async load() {
       await page.goto(APP_URL, { waitUntil: "load" });
-      await page.waitForFunction(() => Boolean(globalThis.hashwasm?.argon2id), null, { timeout: 30000 });
+      await page.waitForFunction(() => document.querySelectorAll("#menu-list li").length > 0, null, { timeout: 30000 });
       // boot() reads IndexedDB; the remember switch reflects it once boot is done.
       await page.waitForTimeout(400);
     },
     async reload() {
       await page.reload({ waitUntil: "load" });
-      await page.waitForFunction(() => Boolean(globalThis.hashwasm?.argon2id), null, { timeout: 30000 });
+      await page.waitForFunction(() => document.querySelectorAll("#menu-list li").length > 0, null, { timeout: 30000 });
       await page.waitForTimeout(400);
     },
     calls: () => page.evaluate(() => ({ ...window.__webauthn })),

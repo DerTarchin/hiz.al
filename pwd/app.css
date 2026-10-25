@@ -1,3 +1,12 @@
+/* Self-hosted (OFL, fonts/OFL.txt): no third-party connections on a slow network. */
+@font-face {
+  font-family: "Kode Mono";
+  src: url("./fonts/kode-mono-latin-wght-normal.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   color-scheme: dark;
   --accent-start: #283c86;
@@ -289,6 +298,12 @@ html.pwa-standalone .remember-toggle {
 
 .phrase-field-input-wrap {
   position: relative;
+}
+
+/* Masks the text field without making it a password field. */
+.phrase-secret {
+  -webkit-text-security: disc;
+  text-security: disc;
 }
 
 .phrase-field-input-wrap input {

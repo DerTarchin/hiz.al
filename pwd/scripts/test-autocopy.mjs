@@ -59,7 +59,7 @@ await page.addInitScript(() => {
 });
 
 await page.goto(`http://127.0.0.1:${port}/index.html`, { waitUntil: "networkidle" });
-await page.waitForFunction(() => Boolean(globalThis.hashwasm?.argon2id), { timeout: 30000 });
+await page.waitForFunction(() => document.querySelectorAll("#menu-list li").length > 0, { timeout: 30000 });
 
 await page.evaluate(() => {
   const phrase = document.querySelector("#phrase");

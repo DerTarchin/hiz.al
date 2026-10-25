@@ -1,35 +1,26 @@
-const CACHE = "pwd-shell-51";
+const CACHE = "pwd-shell-52";
 const NETWORK_TIMEOUT_MS = 2500;
 
-const SPLASH_SIZES = [
-  "640x1136", "1136x640", "750x1334", "1334x750", "1125x2436", "2436x1125",
-  "1170x2532", "2532x1170", "1179x2556", "2556x1179", "1242x2208", "2208x1242",
-  "828x1792", "1792x828", "1242x2688", "2688x1242", "1284x2778", "2778x1284",
-  "1290x2796", "2796x1290",
-];
-
+// Only what the app needs to run offline. Icons and iOS splash screens (about
+// 2.4 MB) are cached when they are first requested instead of on install, so
+// a first visit on a slow network is not competing with them.
 const ASSETS = [
   "./",
   "./index.html",
   "./app.css",
   "./app.js",
   "./derive.js",
+  "./sites.js",
   "./site-registry.js",
+  "./passphrase-fingerprint.js",
   "./catalog.json",
   "./catalog.json.gz",
   "./argon2.js",
   "./kdf-worker.js",
-  "./matrix-loading.js",
-  "./passphrase-fingerprint.js",
+  "./fonts/kode-mono-latin-wght-normal.woff2",
   "./manifest.json",
   "./favicon.ico",
-  "./icon-192.png",
-  "./icon-512.png",
-  "./icon-192-maskable.png",
-  "./icon-512-maskable.png",
   "./apple-touch-icon.png",
-  "./launch.png",
-  ...SPLASH_SIZES.map((size) => `./splash/splash-${size}.png`),
 ];
 
 const NAV_FALLBACK_KEYS = ["./index.html", "./", "./pwd/index.html"];
@@ -56,8 +47,11 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(serveShell(request));
 });
 
+// Only the background refresh (catalog.json.gz) goes to the network first. The
+// catalog the app starts from (catalog.json) comes from the cache like the rest
+// of the shell, so a repeat visit on a bad connection never waits on it.
 function isCatalogRequest(url) {
-  return url.pathname.endsWith("/catalog.json") || url.pathname.endsWith("/catalog.json.gz");
+  return url.pathname.endsWith("/catalog.json.gz");
 }
 
 async function serveCatalog(request) {

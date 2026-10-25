@@ -1,4 +1,3 @@
-import fallbackCatalog from "./catalog.json" with { type: "json" };
 import {
   buildMenu,
   cleanHostInput,
@@ -9,6 +8,15 @@ import {
   rowForInput,
   setSiteRegistry,
 } from "./site-registry.js";
+
+// index.html starts this fetch in its <head> so it downloads alongside the
+// modules (Safari re-downloads JSON-module and fetch preloads, so no hint).
+const fallbackCatalog = await (globalThis.__hizCatalog ?? Promise.reject(new Error("no early fetch")))
+  .catch(() => fetch(new URL("./catalog.json", import.meta.url)).then((response) => {
+    if (!response.ok) throw new Error(`Site catalog request failed (${response.status})`);
+    return response.json();
+  }));
+globalThis.__hizCatalog = null;
 
 const STORAGE_KEY = "hizPwdSiteCatalog";
 const TTL_MS = 60 * 60 * 1000;

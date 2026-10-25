@@ -298,17 +298,39 @@ passwordEl.addEventListener("keydown", (event) => {
 installDeferredAutoCopyFlush();
 
 renderMenu();
-void boot();
+const booted = boot();
+registerServiceWorkerWhenIdle();
+
+/**
+ * Offline support, but not at the expense of a first visit on a slow network:
+ * register (and precache) only after the page has loaded and gone idle.
+ */
+function registerServiceWorkerWhenIdle() {
+  if (!("serviceWorker" in navigator)) return;
+  const register = () => {
+    navigator.serviceWorker.register(new URL("./sw.js", import.meta.url)).catch(() => {});
+  };
+  const whenIdle = () => {
+    if (window.requestIdleCallback) window.requestIdleCallback(register, { timeout: 5000 });
+    else window.setTimeout(register, 2000);
+  };
+  const loaded = document.readyState === "complete"
+    ? Promise.resolve()
+    : new Promise((resolve) => window.addEventListener("load", resolve, { once: true }));
+  // After the page has loaded and the Argon2id worker is ready, so the
+  // precache never competes with what the first password needs.
+  void Promise.all([loaded, booted.catch(() => {})]).then(whenIdle);
+}
 
 function focusPhrase() {
   phraseInput.focus({ preventScroll: true });
 }
 
 async function boot() {
-  // The embedded catalog is already in place; the refresh can take seconds on
-  // a slow network, and nothing below should wait for it.
-  void loadSiteCatalog().catch(() => {});
   await probeKdfWorker();
+  // The embedded catalog is already in place. Refresh it only after the worker
+  // is ready (so it does not compete with the first password), and never wait.
+  void loadSiteCatalog().catch(() => {});
   const standalone = document.documentElement.classList.contains("pwa-standalone");
   try {
     const userId = await readStored(PASSKEY_USER);
@@ -679,9 +701,31 @@ function disableKdfWorker() {
 
 function ensureKdfWorker() {
   if (!kdfWorker) {
-    kdfWorker = new Worker(new URL("./kdf-worker.js", import.meta.url));
+    // index.html starts the worker early so Argon2id downloads alongside the app.
+    kdfWorker = window.__hizKdfWorker ?? new Worker(new URL("./kdf-worker.js", import.meta.url));
+    window.__hizKdfWorker = null;
   }
   return kdfWorker;
+}
+
+let argon2Loading = null;
+
+/** Main-thread Argon2id, only needed when workers are unavailable. */
+function loadArgon2() {
+  if (globalThis.hashwasm?.argon2id) return Promise.resolve();
+  if (!argon2Loading) {
+    argon2Loading = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = new URL("./argon2.js", import.meta.url).href;
+      script.onload = () => resolve();
+      script.onerror = () => {
+        argon2Loading = null;
+        reject(new Error("Could not load Argon2id"));
+      };
+      document.head.append(script);
+    });
+  }
+  return argon2Loading;
 }
 
 function probeKdfWorker() {
@@ -746,6 +790,7 @@ function deriveMasterKeyViaWorker(phrase) {
 
 async function deriveMasterKeyOffthread(phrase) {
   if (typeof Worker === "undefined" || kdfWorkerDisabled) {
+    await loadArgon2();
     await new Promise((resolve) => requestAnimationFrame(resolve));
     return deriveMasterKey(phrase);
   }
@@ -753,6 +798,7 @@ async function deriveMasterKeyOffthread(phrase) {
     return await deriveMasterKeyViaWorker(phrase);
   } catch {
     disableKdfWorker();
+    await loadArgon2();
     await new Promise((resolve) => requestAnimationFrame(resolve));
     return deriveMasterKey(phrase);
   }

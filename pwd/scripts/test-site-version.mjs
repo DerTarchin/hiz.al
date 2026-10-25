@@ -48,7 +48,7 @@ const page = await context.newPage();
 
 async function load() {
   await page.goto(url, { waitUntil: "load" });
-  await page.waitForFunction(() => Boolean(globalThis.hashwasm?.argon2id));
+  await page.waitForFunction(() => document.querySelectorAll("#menu-list li").length > 0);
   await page.waitForTimeout(300);
 }
 
@@ -119,12 +119,19 @@ const phraseField = await page.evaluate(() => {
   return {
     type: el.type,
     autocomplete: el.getAttribute("autocomplete"),
+    autocorrect: el.getAttribute("autocorrect"),
+    spellcheck: el.getAttribute("spellcheck"),
+    writingsuggestions: el.getAttribute("writingsuggestions"),
+    masked: getComputedStyle(el).webkitTextSecurity,
     inForm: Boolean(el.closest("form")),
     ignoredByExtension: el.hasAttribute("data-hiz-pwd-ignore"),
   };
 });
-check(phraseField.type === "password" && phraseField.autocomplete === "new-password",
-  `secure-text field with autocomplete="new-password" (${JSON.stringify(phraseField)})`);
+check(phraseField.type === "text" && phraseField.masked === "disc",
+  `masked text field, not a password field (${JSON.stringify(phraseField)})`);
+check(phraseField.autocomplete === "off" && phraseField.autocorrect === "off"
+  && phraseField.spellcheck === "false" && phraseField.writingsuggestions === "false",
+  "autocomplete, autocorrect, spellcheck, and writing suggestions off");
 check(!phraseField.inForm, "not inside a <form>");
 check(phraseField.ignoredByExtension, "marked so the Chrome extension skips it");
 
