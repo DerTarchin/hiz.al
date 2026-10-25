@@ -1,0 +1,634 @@
+{
+  "schema": 1,
+  "revision": 2026102501,
+  "favorites": [
+    "pnc",
+    "robinhood",
+    "schwab",
+    "chase",
+    "wells fargo",
+    "paypal",
+    "venmo"
+  ],
+  "compoundSuffixes": [
+    "co.uk",
+    "org.uk",
+    "ac.uk",
+    "gov.uk",
+    "com.au",
+    "net.au",
+    "org.au",
+    "co.jp",
+    "ne.jp",
+    "or.jp",
+    "com.br",
+    "com.mx",
+    "com.tr",
+    "com.ar",
+    "com.sg",
+    "com.hk",
+    "com.tw",
+    "co.nz",
+    "co.za",
+    "co.in",
+    "co.kr",
+    "com.co",
+    "github.io",
+    "blogspot.com",
+    "netlify.app",
+    "vercel.app",
+    "pages.dev"
+  ],
+  "hostPrefixes": [
+    "www",
+    "www2",
+    "www3",
+    "m",
+    "mobile",
+    "web"
+  ],
+  "sites": [
+    {
+      "name": "Chase",
+      "key": "chase",
+      "hosts": [
+        "chase.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Wells Fargo",
+      "key": "wells fargo",
+      "hosts": [
+        "wellsfargo.com"
+      ],
+      "aliases": [
+        "wellsfargo"
+      ]
+    },
+    {
+      "name": "Citi",
+      "key": "citi",
+      "hosts": [
+        "citi.com",
+        "citibank.com"
+      ],
+      "aliases": [
+        "citibank"
+      ]
+    },
+    {
+      "name": "Ally",
+      "key": "ally",
+      "hosts": [
+        "ally.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "PNC",
+      "key": "pnc",
+      "hosts": [
+        "pnc.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "TD Bank",
+      "key": "td bank",
+      "hosts": [
+        "td.com",
+        "tdbank.com"
+      ],
+      "aliases": [
+        "td"
+      ]
+    },
+    {
+      "name": "Citizens",
+      "key": "citizens",
+      "hosts": [
+        "citizensbank.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Marcus",
+      "key": "marcus",
+      "hosts": [
+        "marcus.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Synchrony",
+      "key": "synchrony",
+      "hosts": [
+        "synchrony.com",
+        "synchronybank.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Barclays",
+      "key": "barclays",
+      "hosts": [
+        "barclays.com",
+        "barclaycardus.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Fidelity",
+      "key": "fidelity",
+      "hosts": [
+        "fidelity.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Schwab",
+      "key": "schwab",
+      "hosts": [
+        "schwab.com"
+      ],
+      "aliases": [
+        "charles schwab",
+        "charlesschwab"
+      ]
+    },
+    {
+      "name": "E*TRADE",
+      "key": "etrade",
+      "hosts": [
+        "etrade.com"
+      ],
+      "aliases": [
+        "etrade",
+        "e*trade",
+        "e trade"
+      ]
+    },
+    {
+      "name": "Robinhood",
+      "key": "robinhood",
+      "hosts": [
+        "robinhood.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "PayPal",
+      "key": "paypal",
+      "hosts": [
+        "paypal.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Venmo",
+      "key": "venmo",
+      "hosts": [
+        "venmo.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Cash App",
+      "key": "cash app",
+      "hosts": [
+        "cash.app"
+      ],
+      "aliases": [
+        "cashapp"
+      ]
+    },
+    {
+      "name": "Zelle",
+      "key": "zelle",
+      "hosts": [
+        "zelle.com",
+        "zellepay.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "IRS",
+      "key": "irs",
+      "hosts": [
+        "irs.gov"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Social Security",
+      "key": "social security",
+      "hosts": [
+        "ssa.gov"
+      ],
+      "aliases": [
+        "ssa"
+      ]
+    },
+    {
+      "name": "Apple",
+      "key": "apple",
+      "hosts": [
+        "apple.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "iCloud",
+      "key": "icloud",
+      "hosts": [
+        "icloud.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Google",
+      "key": "google",
+      "hosts": [
+        "google.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Gmail",
+      "key": "gmail",
+      "hosts": [
+        "gmail.com",
+        "mail.google.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "YouTube",
+      "key": "youtube",
+      "hosts": [
+        "youtube.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Amazon",
+      "key": "amazon",
+      "hosts": [
+        "amazon.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "AWS",
+      "key": "aws",
+      "hosts": [
+        "aws.amazon.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Microsoft",
+      "key": "microsoft",
+      "hosts": [
+        "microsoft.com",
+        "microsoftonline.com",
+        "live.com",
+        "office.com",
+        "office365.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Outlook",
+      "key": "outlook",
+      "hosts": [
+        "outlook.com",
+        "hotmail.com",
+        "outlook.office.com",
+        "outlook.live.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "GitHub",
+      "key": "github",
+      "hosts": [
+        "github.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Netflix",
+      "key": "netflix",
+      "hosts": [
+        "netflix.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Spotify",
+      "key": "spotify",
+      "hosts": [
+        "spotify.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Dropbox",
+      "key": "dropbox",
+      "hosts": [
+        "dropbox.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Adobe",
+      "key": "adobe",
+      "hosts": [
+        "adobe.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Slack",
+      "key": "slack",
+      "hosts": [
+        "slack.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Notion",
+      "key": "notion",
+      "hosts": [
+        "notion.so",
+        "notion.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Zoom",
+      "key": "zoom",
+      "hosts": [
+        "zoom.us",
+        "zoom.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "LinkedIn",
+      "key": "linkedin",
+      "hosts": [
+        "linkedin.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Facebook",
+      "key": "facebook",
+      "hosts": [
+        "facebook.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Instagram",
+      "key": "instagram",
+      "hosts": [
+        "instagram.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "WhatsApp",
+      "key": "whatsapp",
+      "hosts": [
+        "whatsapp.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "X",
+      "key": "x",
+      "hosts": [
+        "x.com",
+        "twitter.com"
+      ],
+      "aliases": [
+        "twitter"
+      ]
+    },
+    {
+      "name": "Reddit",
+      "key": "reddit",
+      "hosts": [
+        "reddit.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Discord",
+      "key": "discord",
+      "hosts": [
+        "discord.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Steam",
+      "key": "steam",
+      "hosts": [
+        "steampowered.com",
+        "steamcommunity.com",
+        "store.steampowered.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "eBay",
+      "key": "ebay",
+      "hosts": [
+        "ebay.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Walmart",
+      "key": "walmart",
+      "hosts": [
+        "walmart.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Target",
+      "key": "target",
+      "hosts": [
+        "target.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Best Buy",
+      "key": "best buy",
+      "hosts": [
+        "bestbuy.com"
+      ],
+      "aliases": [
+        "bestbuy"
+      ]
+    },
+    {
+      "name": "Costco",
+      "key": "costco",
+      "hosts": [
+        "costco.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Uber",
+      "key": "uber",
+      "hosts": [
+        "uber.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Lyft",
+      "key": "lyft",
+      "hosts": [
+        "lyft.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Airbnb",
+      "key": "airbnb",
+      "hosts": [
+        "airbnb.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Delta",
+      "key": "delta",
+      "hosts": [
+        "delta.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "United",
+      "key": "united",
+      "hosts": [
+        "united.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "American Airlines",
+      "key": "american airlines",
+      "hosts": [
+        "aa.com"
+      ],
+      "aliases": [
+        "aa"
+      ]
+    },
+    {
+      "name": "Southwest",
+      "key": "southwest",
+      "hosts": [
+        "southwest.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Expedia",
+      "key": "expedia",
+      "hosts": [
+        "expedia.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "TurboTax",
+      "key": "turbotax",
+      "hosts": [
+        "turbotax.com",
+        "turbotax.intuit.com"
+      ],
+      "aliases": [
+        "turbotax"
+      ]
+    },
+    {
+      "name": "Credit Karma",
+      "key": "credit karma",
+      "hosts": [
+        "creditkarma.com"
+      ],
+      "aliases": [
+        "creditkarma"
+      ]
+    },
+    {
+      "name": "Equifax",
+      "key": "equifax",
+      "hosts": [
+        "equifax.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Experian",
+      "key": "experian",
+      "hosts": [
+        "experian.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "TransUnion",
+      "key": "transunion",
+      "hosts": [
+        "transunion.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Namecheap",
+      "key": "namecheap",
+      "hosts": [
+        "namecheap.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Cloudflare",
+      "key": "cloudflare",
+      "hosts": [
+        "cloudflare.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "OpenAI",
+      "key": "openai",
+      "hosts": [
+        "openai.com"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ChatGPT",
+      "key": "chatgpt",
+      "hosts": [
+        "chatgpt.com"
+      ],
+      "aliases": []
+    }
+  ]
+}

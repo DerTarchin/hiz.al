@@ -1,4 +1,4 @@
-const CACHE = "pwd-shell-39";
+const CACHE = "pwd-shell-40";
 const NETWORK_TIMEOUT_MS = 2500;
 
 const SPLASH_SIZES = [
@@ -14,7 +14,9 @@ const ASSETS = [
   "./app.css",
   "./app.js",
   "./derive.js",
-  "./sites.js",
+  "./site-registry.js",
+  "./catalog.json",
+  "./catalog.json.gz",
   "./argon2.js",
   "./manifest.json",
   "./favicon.ico",
@@ -44,8 +46,33 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
   if (!url.pathname.startsWith("/pwd")) return;
   if (url.pathname.endsWith("/sw.js")) return;
+  if (isCatalogRequest(url)) {
+    event.respondWith(serveCatalog(request));
+    return;
+  }
   event.respondWith(serveShell(request));
 });
+
+function isCatalogRequest(url) {
+  return url.pathname.endsWith("/catalog.json") || url.pathname.endsWith("/catalog.json.gz");
+}
+
+async function serveCatalog(request) {
+  try {
+    const response = await fetchWithTimeout(request, NETWORK_TIMEOUT_MS);
+    if (response.ok) {
+      const cache = await caches.open(CACHE);
+      cache.put(request, response.clone());
+      return response;
+    }
+  } catch {
+    /* use the precached catalog */
+  }
+  const cache = await caches.open(CACHE);
+  const cached = await matchCached(cache, request);
+  if (cached) return cached;
+  return fetch(request);
+}
 
 async function activate() {
   const cache = await caches.open(CACHE);

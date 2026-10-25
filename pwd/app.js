@@ -1,5 +1,5 @@
 import { deriveMasterKey, passwordFromMaster } from "./derive.js";
-import { buildMenu, cleanHostInput, matchHighlightRange, rowForInput } from "./sites.js";
+import { buildMenu, cleanHostInput, loadSiteCatalog, matchHighlightRange, rowForInput } from "./sites.js";
 
 const phraseInput = document.querySelector("#phrase");
 const siteInput = document.querySelector("#site");
@@ -193,6 +193,11 @@ function focusPhrase() {
 }
 
 async function boot() {
+  try {
+    await loadSiteCatalog();
+  } catch {
+    /* embedded catalog stays in place */
+  }
   try {
     const saved = await loadMasterKey();
     if (!saved) {
