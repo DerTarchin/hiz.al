@@ -2,6 +2,7 @@ import { deriveMasterKey, passwordFromMaster } from "./derive.js";
 import { buildMenu, cleanHostInput, loadSiteCatalog, matchHighlightRange, rowForInput } from "./sites.js";
 
 const phraseInput = document.querySelector("#phrase");
+const phraseField = document.querySelector("#phrase-field");
 const siteInput = document.querySelector("#site");
 const siteClearBtn = document.querySelector("#site-clear");
 const siteField = document.querySelector("#site-field");
@@ -18,9 +19,34 @@ const errorEl = document.querySelector("#error");
 const DB_NAME = "hiz-pwd";
 const STORE = "vault";
 const RECORD = "device";
+const PASSKEY_USER = "passkey-user";
+
+/**
+ * Remember keeps the Argon2id master key wrapped with AES-GCM. The wrapping
+ * key comes from the WebAuthn PRF extension of a platform passkey, so reading
+ * the saved key back needs Face ID / Touch ID. Stored record:
+ *   { v: 2, credentialId, prfSalt, iv, ct }   (iv/ct are absent until a key is saved)
+ * Records from before v2 held the AES key next to the ciphertext and are dropped.
+ */
+const RECORD_VERSION = 2;
+const WRAP_INFO = new TextEncoder().encode("hiz.al/pwd remember v2");
+const RELOCK_AFTER_MS = 60 * 1000;
+const PLACEHOLDER_DEFAULT = "Long memorable phrase";
+const PLACEHOLDER_SAVED = "Saved on this device";
+const PLACEHOLDER_LOCKED = "Saved · tap to unlock";
+const UNLOCK_RETRY_HINT = "Unlock was cancelled. Tap the passphrase field to try again.";
+const PRF_UNSUPPORTED = "This device can't lock a remembered passphrase behind Face ID.";
 
 let sessionKey = null;
 let sessionPhrase = "";
+let sessionFromSaved = false;
+let savedRecord = null;
+let passkeyUserId = null;
+let prfWrap = null;
+let unlockPromise = null;
+let unlockDeclined = false;
+let rememberPromise = null;
+let hiddenAt = 0;
 let manualActive = null;
 let pinned = null;
 let busy = false;
@@ -47,13 +73,32 @@ function shouldLockPassphrase() {
   return isIosDevice()
     && document.documentElement.classList.contains("pwa-standalone")
     && rememberInput.checked
-    && Boolean(sessionKey)
+    && (Boolean(sessionKey) || hasSavedKey())
     && !phraseInput.value.trim();
 }
 
+function hasSavedKey() {
+  return Boolean(savedRecord?.ct);
+}
+
+/** A key is saved on this device but has not been unlocked with Face ID yet. */
+function savedKeyLocked() {
+  return hasSavedKey() && !(sessionKey && sessionFromSaved);
+}
+
+function syncPassphrasePlaceholder() {
+  if (!hasSavedKey()) phraseInput.placeholder = PLACEHOLDER_DEFAULT;
+  else phraseInput.placeholder = savedKeyLocked() ? PLACEHOLDER_LOCKED : PLACEHOLDER_SAVED;
+}
+
 function updatePassphraseFieldState() {
+  syncPassphrasePlaceholder();
   const lock = shouldLockPassphrase();
   document.documentElement.classList.toggle("passphrase-locked", lock);
+  document.documentElement.classList.toggle(
+    "passphrase-sealed",
+    savedKeyLocked() && !phraseInput.value,
+  );
   phraseInput.tabIndex = lock ? -1 : 0;
   if (lock) {
     phraseInput.setAttribute("readonly", "");
@@ -89,8 +134,13 @@ phraseInput.addEventListener("keydown", () => {
   phraseInput.removeAttribute("readonly");
 });
 
+phraseField.addEventListener("click", () => {
+  if (phraseInput.value || !savedKeyLocked()) return;
+  void unlockFromTap();
+});
+
 phraseInput.addEventListener("input", () => {
-  if (phraseInput.value) phraseInput.placeholder = "Long memorable phrase";
+  syncPassphrasePlaceholder();
   onCredentialsInput();
 });
 
@@ -202,61 +252,109 @@ async function boot() {
   } catch {
     /* embedded catalog stays in place */
   }
+  const standalone = document.documentElement.classList.contains("pwa-standalone");
   try {
-    const saved = await loadMasterKey();
-    if (!saved) {
-      focusPhrase();
-      return;
-    }
-    wipe(sessionKey);
-    sessionKey = saved;
-    sessionPhrase = "";
-    if (document.documentElement.classList.contains("pwa-standalone")) {
-      rememberInput.checked = true;
-    }
-    phraseInput.placeholder = "Saved on this device";
-    updatePassphraseFieldState();
-    focusInitial();
+    const userId = await readStored(PASSKEY_USER);
+    if (userId instanceof Uint8Array) passkeyUserId = userId;
   } catch {
-    await deleteRecord();
-    updatePassphraseFieldState();
-    focusPhrase();
+    /* Remember makes a new passkey user handle when it is turned on */
   }
+  let saved = null;
+  try {
+    saved = await readStored(RECORD);
+  } catch {
+    saved = null;
+  }
+  if (saved && !isCurrentRecord(saved)) {
+    saved = null;
+    try {
+      await deleteStored(RECORD);
+    } catch {
+      /* the next save overwrites it */
+    }
+    if (standalone) {
+      showError("Remember now unlocks with Face ID. Turn it on again to save your passphrase.");
+    }
+  }
+  savedRecord = saved;
+  if (savedRecord && standalone) rememberInput.checked = true;
+  updatePassphraseFieldState();
+  focusInitial();
 }
 
 window.addEventListener("pageshow", () => {
+  relockIfAway();
   updatePassphraseFieldState();
   focusInitial();
 });
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") {
+    hiddenAt = Date.now();
+    return;
+  }
+  relockIfAway();
+});
+
+/** After a minute in the background, the unlocked saved key needs Face ID again. */
+function relockIfAway() {
+  const away = hiddenAt ? Date.now() - hiddenAt : 0;
+  hiddenAt = 0;
+  if (away < RELOCK_AFTER_MS || !sessionFromSaved) return;
+  wipe(sessionKey);
+  sessionKey = null;
+  sessionPhrase = "";
+  sessionFromSaved = false;
+  prfWrap = null;
+  unlockDeclined = false;
+  window.clearTimeout(copyDebounceTimer);
+  clearPasswordOutput();
+  passwordEl.textContent = "";
+  clearError();
+  updatePassphraseFieldState();
+}
 
 async function onRememberToggle() {
   if (!document.documentElement.classList.contains("pwa-standalone")) {
     rememberInput.checked = false;
     return;
   }
+  clearError();
   if (rememberInput.checked) {
-    if (sessionKey) {
-      try {
-        await saveMasterKey(sessionKey);
-        if (!phraseInput.value) phraseInput.placeholder = "Saved on this device";
-      } catch {
-        rememberInput.checked = false;
-        showError("Could not save the key on this device.");
-      }
+    rememberPromise = enableRemember();
+    try {
+      await rememberPromise;
+    } catch (error) {
+      rememberInput.checked = false;
+      showError(error?.cancelled
+        ? "Remember stays off because Face ID was cancelled."
+        : errorText(error, "Could not turn on Remember."));
+    } finally {
+      rememberPromise = null;
+      updatePassphraseFieldState();
     }
     return;
   }
-  wipe(sessionKey);
-  sessionKey = null;
-  sessionPhrase = "";
-  phraseInput.placeholder = "Long memorable phrase";
   try {
-    await deleteRecord();
+    await forgetSavedKey();
   } catch {
     showError("Could not forget the saved key.");
   }
   updatePassphraseFieldState();
   if (!phraseInput.value) focusInitial();
+}
+
+async function unlockFromTap() {
+  unlockDeclined = false;
+  clearError();
+  try {
+    await unlockSavedKey();
+  } catch (error) {
+    showError(errorText(error, UNLOCK_RETRY_HINT));
+    return;
+  }
+  if (readyToGenerate()) await generate({ commit: false, copy: true });
+  else focusSite();
 }
 
 function rowForPinnedCommit() {
@@ -300,7 +398,7 @@ function rowForGeneration(commit) {
 
 function readyToGenerate() {
   if (!siteInput.value.trim()) return false;
-  if (!phraseInput.value.trim() && !sessionKey) return false;
+  if (!phraseInput.value.trim() && !sessionKey && !hasSavedKey()) return false;
   return Boolean(rowForInput(siteInput.value));
 }
 
@@ -378,9 +476,10 @@ async function generate({ commit = false, copy = false } = {}) {
   busy = true;
   form.setAttribute("aria-busy", "true");
   const needsKdf = Boolean(phraseInput.value) && phraseInput.value.normalize("NFC") !== sessionPhrase;
-  if (needsKdf) {
+  const needsUnlock = !phraseInput.value && !sessionKey && hasSavedKey() && !unlockDeclined;
+  if (needsKdf || needsUnlock) {
     result.hidden = false;
-    passwordEl.textContent = "Deriving…";
+    passwordEl.textContent = needsKdf ? "Deriving…" : "Unlocking…";
     passwordEl.classList.add("pending");
     copyButton.hidden = true;
     passwordText = "";
@@ -416,17 +515,30 @@ async function masterKey() {
     wipe(sessionKey);
     sessionKey = derived;
     sessionPhrase = phrase;
-    if (rememberEnabled()) {
-      await saveMasterKey(sessionKey);
-      phraseInput.value = "";
-      sessionPhrase = "";
-      phraseInput.placeholder = "Saved on this device";
-      updatePassphraseFieldState();
-    }
+    sessionFromSaved = false;
+    if (rememberEnabled()) await rememberDerivedKey(derived);
     return sessionKey;
   }
   if (sessionKey) return sessionKey;
+  if (hasSavedKey()) return unlockSavedKey();
   throw new Error("Enter a passphrase first.");
+}
+
+async function rememberDerivedKey(key) {
+  let saved = false;
+  try {
+    saved = await saveMasterKey(key);
+  } catch (error) {
+    showError(error?.cancelled
+      ? "Passphrase not saved because Face ID was cancelled."
+      : `Passphrase not saved. ${errorText(error, "")}`.trim());
+    return;
+  }
+  if (!saved || sessionKey !== key) return;
+  phraseInput.value = "";
+  sessionPhrase = "";
+  sessionFromSaved = true;
+  updatePassphraseFieldState();
 }
 
 async function performAutoCopy(text) {
@@ -733,29 +845,286 @@ function withStore(mode, run) {
   }));
 }
 
+function readStored(key) {
+  return withStore("readonly", (store) => store.get(key));
+}
+
+function writeStored(key, value) {
+  return withStore("readwrite", (store) => store.put(value, key));
+}
+
+function deleteStored(key) {
+  return withStore("readwrite", (store) => store.delete(key));
+}
+
+function isCurrentRecord(record) {
+  return record?.v === RECORD_VERSION
+    && record.credentialId instanceof Uint8Array
+    && record.prfSalt instanceof Uint8Array;
+}
+
+/** Turning Remember on makes a passkey and saves the current key under it. */
+async function enableRemember() {
+  const enrolled = await enrollPasskey();
+  const record = enrolled.record;
+  if (!rememberInput.checked) {
+    signalUnknownCredential(record.credentialId);
+    return;
+  }
+  const previous = savedRecord;
+  prfWrap = { credentialId: record.credentialId, key: enrolled.key };
+  const phrase = phraseInput.value.normalize("NFC");
+  const key = sessionKey && (!phrase || phrase === sessionPhrase) ? sessionKey : null;
+  const next = key ? { ...record, ...(await sealMasterKey(key, enrolled.key)) } : record;
+  await writeStored(RECORD, next);
+  savedRecord = next;
+  if (key && sessionKey === key) {
+    sessionFromSaved = true;
+    phraseInput.value = "";
+    sessionPhrase = "";
+  }
+  if (previous && !bytesEqual(previous.credentialId, record.credentialId)) {
+    signalUnknownCredential(previous.credentialId);
+  }
+}
+
+async function forgetSavedKey() {
+  const record = savedRecord;
+  savedRecord = null;
+  prfWrap = null;
+  unlockDeclined = false;
+  sessionFromSaved = false;
+  wipe(sessionKey);
+  sessionKey = null;
+  sessionPhrase = "";
+  if (record) signalUnknownCredential(record.credentialId);
+  await deleteStored(RECORD);
+}
+
+/** Returns false when a newer key replaced this one before the save finished. */
 async function saveMasterKey(bytes) {
-  const wrappingKey = await crypto.subtle.generateKey(
-    { name: "AES-GCM", length: 256 },
-    false,
-    ["encrypt", "decrypt"],
-  );
+  const plain = bytes.slice();
+  try {
+    if (rememberPromise) await rememberPromise.catch(() => {});
+    const record = savedRecord;
+    if (!record) throw new Error("Turn Remember on again.");
+    const key = await wrapKeyFor(record);
+    const sealed = await sealMasterKey(plain, key);
+    const current = savedRecord;
+    if (sessionKey !== bytes || !current || !bytesEqual(current.credentialId, record.credentialId)) {
+      return false;
+    }
+    const next = {
+      v: RECORD_VERSION,
+      credentialId: record.credentialId,
+      prfSalt: record.prfSalt,
+      ...sealed,
+    };
+    savedRecord = next;
+    await writeStored(RECORD, next);
+    return true;
+  } finally {
+    wipe(plain);
+  }
+}
+
+/** One Face ID prompt per unlock; concurrent callers share it. */
+function unlockSavedKey() {
+  if (unlockPromise) return unlockPromise;
+  if (unlockDeclined) return Promise.reject(new Error(UNLOCK_RETRY_HINT));
+  const record = savedRecord;
+  unlockPromise = wrapKeyFor(record)
+    .then(async (key) => {
+      let plain;
+      try {
+        plain = await crypto.subtle.decrypt(
+          { name: "AES-GCM", iv: record.iv, additionalData: WRAP_INFO },
+          key,
+          record.ct,
+        );
+      } catch {
+        if (savedRecord === record) {
+          rememberInput.checked = false;
+          await forgetSavedKey().catch(() => {});
+          updatePassphraseFieldState();
+        }
+        throw new Error("The saved passphrase could not be unlocked, so it was removed. Enter it again.");
+      }
+      if (savedRecord !== record) throw new Error("Remember changed while unlocking. Try again.");
+      wipe(sessionKey);
+      sessionKey = new Uint8Array(plain);
+      sessionPhrase = "";
+      sessionFromSaved = true;
+      updatePassphraseFieldState();
+      return sessionKey;
+    })
+    .catch((error) => {
+      if (!error?.cancelled) throw error;
+      unlockDeclined = true;
+      updatePassphraseFieldState();
+      throw new Error(UNLOCK_RETRY_HINT);
+    })
+    .finally(() => {
+      unlockPromise = null;
+    });
+  return unlockPromise;
+}
+
+/**
+ * Calls navigator.credentials.get synchronously when no key is cached, so a
+ * tap or keystroke that led here still counts as the user's gesture.
+ */
+function wrapKeyFor(record) {
+  if (prfWrap && bytesEqual(prfWrap.credentialId, record.credentialId)) {
+    return Promise.resolve(prfWrap.key);
+  }
+  return prfSecret(record.credentialId, record.prfSalt)
+    .then(wrapKeyFromSecret)
+    .then((key) => {
+      prfWrap = { credentialId: record.credentialId, key };
+      return key;
+    });
+}
+
+async function enrollPasskey() {
+  if (!window.PublicKeyCredential || !navigator.credentials?.create) {
+    throw new Error(PRF_UNSUPPORTED);
+  }
+  const userId = passkeyUserId ?? crypto.getRandomValues(new Uint8Array(16));
+  const prfSalt = crypto.getRandomValues(new Uint8Array(32));
+  const credential = await callWebAuthn(() => navigator.credentials.create({
+    publicKey: {
+      rp: { name: "Password Generator" },
+      // One stable handle per device, so turning Remember on again replaces
+      // this device's passkey instead of piling up new ones.
+      user: { id: userId, name: "Remembered passphrase", displayName: "Password Generator" },
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      pubKeyCredParams: [
+        { type: "public-key", alg: -7 },
+        { type: "public-key", alg: -257 },
+      ],
+      authenticatorSelection: {
+        authenticatorAttachment: "platform",
+        residentKey: "preferred",
+        userVerification: "required",
+      },
+      hints: ["client-device"],
+      attestation: "none",
+      timeout: 120000,
+      extensions: { prf: { eval: { first: prfSalt } } },
+    },
+  }));
+  const credentialId = new Uint8Array(credential.rawId);
+  try {
+    if (!passkeyUserId) {
+      passkeyUserId = userId;
+      await writeStored(PASSKEY_USER, userId).catch(() => {});
+    }
+    const prf = credential.getClientExtensionResults?.().prf;
+    let secret = prf?.results?.first ? new Uint8Array(prf.results.first) : null;
+    if (!secret) {
+      // Some platforms only report prf.enabled at registration; ask once more.
+      if (prf?.enabled !== true) throw new Error(PRF_UNSUPPORTED);
+      secret = await prfSecret(credentialId, prfSalt);
+    }
+    const key = await wrapKeyFromSecret(secret);
+    return { record: { v: RECORD_VERSION, credentialId, prfSalt }, key };
+  } catch (error) {
+    signalUnknownCredential(credentialId);
+    throw error;
+  }
+}
+
+function prfSecret(credentialId, prfSalt) {
+  return callWebAuthn(() => navigator.credentials.get({
+    publicKey: {
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      allowCredentials: [{ type: "public-key", id: credentialId, transports: ["internal"] }],
+      userVerification: "required",
+      hints: ["client-device"],
+      timeout: 120000,
+      extensions: { prf: { eval: { first: prfSalt } } },
+    },
+  })).then((credential) => {
+    const first = credential.getClientExtensionResults?.().prf?.results?.first;
+    if (!first) throw new Error(PRF_UNSUPPORTED);
+    return new Uint8Array(first);
+  });
+}
+
+async function callWebAuthn(run) {
+  let credential;
+  try {
+    credential = await run();
+  } catch (error) {
+    const name = error?.name;
+    if (name === "NotAllowedError" || name === "AbortError") {
+      const cancelled = new Error("Face ID was cancelled.");
+      cancelled.cancelled = true;
+      throw cancelled;
+    }
+    if (name === "NotSupportedError" || name === "SecurityError" || error instanceof TypeError) {
+      throw new Error(PRF_UNSUPPORTED);
+    }
+    throw new Error(errorText(error, "Face ID failed."));
+  }
+  if (!credential) throw new Error("No passkey was returned.");
+  return credential;
+}
+
+async function wrapKeyFromSecret(secret) {
+  try {
+    const ikm = await crypto.subtle.importKey("raw", secret, "HKDF", false, ["deriveKey"]);
+    return await crypto.subtle.deriveKey(
+      { name: "HKDF", hash: "SHA-256", salt: new Uint8Array(32), info: WRAP_INFO },
+      ikm,
+      { name: "AES-GCM", length: 256 },
+      false,
+      ["encrypt", "decrypt"],
+    );
+  } finally {
+    wipe(secret);
+  }
+}
+
+async function sealMasterKey(bytes, key) {
   const iv = crypto.getRandomValues(new Uint8Array(12));
-  const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, wrappingKey, bytes);
-  await withStore("readwrite", (store) => store.put({ wrappingKey, iv, ct }, RECORD));
-}
-
-async function loadMasterKey() {
-  const record = await withStore("readonly", (store) => store.get(RECORD));
-  if (!record?.wrappingKey || !record.iv || !record.ct) return null;
-  const plain = await crypto.subtle.decrypt(
-    { name: "AES-GCM", iv: record.iv },
-    record.wrappingKey,
-    record.ct,
+  const ct = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv, additionalData: WRAP_INFO },
+    key,
+    bytes,
   );
-  return new Uint8Array(plain);
+  return { iv, ct: new Uint8Array(ct) };
 }
 
-function deleteRecord() {
-  return withStore("readwrite", (store) => store.delete(RECORD));
+/** Best effort: asks the platform to delete a passkey this app no longer uses. */
+function signalUnknownCredential(credentialId) {
+  try {
+    const signal = window.PublicKeyCredential?.signalUnknownCredential;
+    if (typeof signal !== "function") return;
+    signal.call(window.PublicKeyCredential, {
+      rpId: location.hostname,
+      credentialId: base64url(credentialId),
+    }).catch(() => {});
+  } catch {
+    /* unsupported */
+  }
 }
 
+function base64url(bytes) {
+  let text = "";
+  for (const byte of bytes) text += String.fromCharCode(byte);
+  return btoa(text).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function bytesEqual(a, b) {
+  if (!a || !b || a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i += 1) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
+function errorText(error, fallback) {
+  return error instanceof Error && error.message ? error.message : fallback;
+}
