@@ -75,39 +75,46 @@ export function fingerprintPathFromValues(values, { size = 50, neutralRadius = 1
   return smoothClosedPath(pts);
 }
 
+const MOTION_MS = 380;
+
+function easeOutCubic(t) {
+  const x = Math.min(1, Math.max(0, t));
+  return 1 - (1 - x) ** 3;
+}
+
 export function mountPassphraseFingerprint(svgRoot) {
   const pathEl = svgRoot.querySelector("path");
   if (!pathEl) throw new Error("fingerprint svg needs a path");
 
   let displayed = Array(POINTS).fill(NEUTRAL);
   let target = Array(POINTS).fill(NEUTRAL);
+  let animFrom = displayed.slice();
+  let animStart = 0;
   let frame = 0;
 
   const draw = () => {
     pathEl.setAttribute("d", fingerprintPathFromValues(displayed));
   };
 
-  const tick = () => {
-    let settled = true;
+  const tick = (now) => {
+    const t = easeOutCubic((now - animStart) / MOTION_MS);
     for (let i = 0; i < POINTS; i += 1) {
-      const diff = target[i] - displayed[i];
-      if (Math.abs(diff) < 0.08) {
-        displayed[i] = target[i];
-      } else {
-        displayed[i] += diff * 0.28;
-        settled = false;
-      }
+      displayed[i] = animFrom[i] + (target[i] - animFrom[i]) * t;
     }
     draw();
-    if (!settled) {
+    if (now - animStart < MOTION_MS) {
       frame = requestAnimationFrame(tick);
     } else {
+      displayed = target.slice();
+      draw();
       frame = 0;
     }
   };
 
   const update = (passphrase) => {
     target = passphraseFingerprintValues(passphrase);
+    animFrom = displayed.slice();
+    animStart = performance.now();
     if (!frame) frame = requestAnimationFrame(tick);
   };
 

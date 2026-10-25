@@ -1,4 +1,4 @@
-const CACHE = "pwd-shell-50";
+const CACHE = "pwd-shell-51";
 const NETWORK_TIMEOUT_MS = 2500;
 
 const SPLASH_SIZES = [
