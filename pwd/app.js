@@ -29,6 +29,8 @@ let copyDebounceTimer = 0;
 let generateSerial = 0;
 let passwordText = "";
 let lastAutoCopiedPassword = "";
+let pendingAutoCopyText = "";
+const COPY_IDLE_MS = 500;
 let dismissedExactKey = null;
 let suppressSiteBlurCommit = false;
 
@@ -185,6 +187,8 @@ copyButton.addEventListener("click", copyPasswordManually);
 
 passwordEl.addEventListener("click", copyPasswordManually);
 
+installDeferredAutoCopyFlush();
+
 renderMenu();
 void boot();
 
@@ -303,12 +307,27 @@ function readyToGenerate() {
 function scheduleCopyAfterIdle() {
   window.clearTimeout(copyDebounceTimer);
   copyDebounceTimer = window.setTimeout(() => {
-    if (passwordText) void autoCopyPassword(passwordText);
-  }, 1000);
+    if (!passwordText || passwordEl.classList.contains("pending")) return;
+    void performAutoCopy(passwordText);
+  }, COPY_IDLE_MS);
+}
+
+function flushPendingAutoCopy() {
+  if (!pendingAutoCopyText || pendingAutoCopyText === lastAutoCopiedPassword) return;
+  if (!passwordText || passwordEl.classList.contains("pending")) return;
+  void performAutoCopy(pendingAutoCopyText);
+}
+
+function installDeferredAutoCopyFlush() {
+  const flush = () => flushPendingAutoCopy();
+  for (const eventName of ["pointerdown", "touchstart"]) {
+    form.addEventListener(eventName, flush, { capture: true, passive: true });
+  }
 }
 
 function onCredentialsInput() {
   clearCopiedFeedback();
+  flushPendingAutoCopy();
   scheduleCopyAfterIdle();
   void generate({ commit: false, copy: false });
 }
@@ -335,6 +354,7 @@ async function onCredentialsCommit(explicitRow = null, { implicit = false } = {}
 function clearPasswordOutput() {
   passwordText = "";
   lastAutoCopiedPassword = "";
+  pendingAutoCopyText = "";
   result.hidden = true;
   copyButton.hidden = true;
 }
@@ -409,13 +429,25 @@ async function masterKey() {
   throw new Error("Enter a passphrase first.");
 }
 
-async function autoCopyPassword(text) {
-  if (text === lastAutoCopiedPassword) return;
+async function performAutoCopy(text) {
+  if (!text || text === lastAutoCopiedPassword) return false;
+  const ok = await writeClipboard(text);
+  if (!ok) {
+    pendingAutoCopyText = text;
+    return false;
+  }
   lastAutoCopiedPassword = text;
-  await copyToClipboardWithFeedback(text);
+  pendingAutoCopyText = "";
+  showCopiedFeedback();
+  return true;
+}
+
+async function autoCopyPassword(text) {
+  await performAutoCopy(text);
 }
 
 async function copyPassword(text) {
+  pendingAutoCopyText = "";
   lastAutoCopiedPassword = text;
   await copyToClipboardWithFeedback(text);
 }
@@ -449,20 +481,33 @@ async function writeClipboard(text) {
     await navigator.clipboard.writeText(text);
     return true;
   } catch {
-    try {
-      const area = document.createElement("textarea");
-      area.value = text;
-      area.setAttribute("readonly", "");
-      area.style.position = "fixed";
-      area.style.left = "-9999px";
-      document.body.appendChild(area);
-      area.select();
-      const ok = document.execCommand("copy");
-      area.remove();
-      return ok;
-    } catch {
-      return false;
-    }
+    return copyWithHiddenTextarea(text);
+  }
+}
+
+function copyWithHiddenTextarea(text) {
+  try {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.setAttribute("aria-hidden", "true");
+    area.style.position = "fixed";
+    area.style.top = "0";
+    area.style.left = "0";
+    area.style.width = "2em";
+    area.style.height = "2em";
+    area.style.padding = "0";
+    area.style.border = "0";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.focus({ preventScroll: true });
+    area.select();
+    area.setSelectionRange(0, text.length);
+    const ok = document.execCommand("copy");
+    area.remove();
+    return ok;
+  } catch {
+    return false;
   }
 }
 
