@@ -5,12 +5,15 @@
  *   node scripts/test-derive.mjs
  */
 import { randomBytes } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import vm from "node:vm";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 await import(pathToFileURL(join(root, "argon2.js")).href);
 const {
+  APP_SALT,
   EntropyExhaustedError,
   KDF,
   deriveMasterKey,
@@ -60,6 +63,57 @@ for (const bad of [0, -1, 1.5, 1000, "two", null]) {
     threw = true;
   }
   check(threw, `rejects version ${JSON.stringify(bad)}`);
+}
+
+console.log("KDF worker");
+// kdf-worker.js is a classic worker, so it cannot import derive.js and repeats
+// APP_SALT and KDF. Run its source here with a stub `self` and make sure it
+// derives the same master key as derive.js.
+{
+  const source = readFileSync(join(root, "kdf-worker.js"), "utf8");
+  const posted = [];
+  const imported = [];
+  const self = {
+    hashwasm: globalThis.hashwasm,
+    onmessage: null,
+    postMessage: (message) => posted.push(message),
+  };
+  const worker = vm.runInThisContext(
+    `(function (self, importScripts) {\n${source}\n;return { APP_SALT, KDF, runKdfJob };\n})`,
+    { filename: "kdf-worker.js" },
+  )(self, (...urls) => imported.push(...urls));
+  check(imported.join(",") === "argon2.js", "worker loads argon2.js");
+  check(worker.APP_SALT === APP_SALT, `worker salt matches derive.js (${worker.APP_SALT})`);
+  const kdfKeys = ["memorySize", "iterations", "parallelism", "hashLength"];
+  check(
+    Object.keys(worker.KDF).length === kdfKeys.length && kdfKeys.every((key) => worker.KDF[key] === KDF[key]),
+    `worker KDF parameters match derive.js (${JSON.stringify(worker.KDF)})`,
+  );
+  check(typeof self.onmessage === "function", "worker installs an onmessage handler");
+
+  self.onmessage({ data: { id: 1, probe: true } });
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  check(posted.some((m) => m.id === 1 && m.ok && m.probe), "worker answers a probe");
+
+  await worker.runKdfJob({ id: 2, phrase: "test-passphrase" });
+  const reply = posted.find((m) => m.id === 2);
+  const workerKey = reply?.ok ? Buffer.from(reply.key) : null;
+  check(Boolean(workerKey), `worker derives a key (${reply?.error ?? "ok"})`);
+  check(
+    Boolean(workerKey) && workerKey.equals(Buffer.from(masters.get("test-passphrase"))),
+    "worker master key equals derive.js master key",
+  );
+
+  await worker.runKdfJob({ id: 3, phrase: "cafe\u0301 au lait" });
+  const nfc = posted.find((m) => m.id === 3);
+  check(
+    Boolean(nfc?.ok) && Buffer.from(nfc.key).equals(Buffer.from(await deriveMasterKey("caf\u00e9 au lait"))),
+    "worker NFC-normalizes the passphrase like derive.js",
+  );
+
+  await worker.runKdfJob({ id: 4, phrase: "" });
+  const empty = posted.find((m) => m.id === 4);
+  check(empty?.ok === false, "worker rejects an empty passphrase");
 }
 
 console.log("Encoder shape");
