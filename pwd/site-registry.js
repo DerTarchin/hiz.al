@@ -6,6 +6,7 @@
 
 export const CATALOG_SCHEMA = 1;
 
+const SECURITY_TIERS = new Set(["high", "medium", "low"]);
 const SUGGESTION_LIMIT = 3;
 
 let current = null;
@@ -28,6 +29,9 @@ export function normalizeCatalog(raw) {
   const sites = raw.sites.map((entry) => {
     if (!entry || typeof entry.name !== "string" || typeof entry.key !== "string") {
       throw new Error("Invalid site entry");
+    }
+    if (!SECURITY_TIERS.has(entry.security)) {
+      throw new Error(`Invalid or missing security tier for ${entry.key}`);
     }
     if (!Array.isArray(entry.hosts) || entry.hosts.length === 0) {
       throw new Error(`Invalid hosts for ${entry.key}`);

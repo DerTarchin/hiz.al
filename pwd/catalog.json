@@ -1,6 +1,11 @@
 {
   "schema": 1,
-  "revision": 2026102502,
+  "revision": 2026102602,
+  "securityTierOrder": [
+    "high",
+    "medium",
+    "low"
+  ],
   "favorites": [
     "pnc",
     "robinhood",
@@ -49,22 +54,99 @@
   ],
   "sites": [
     {
+      "name": "ADP",
+      "key": "adp",
+      "hosts": [
+        "adp.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Ally",
+      "key": "ally",
+      "hosts": [
+        "ally.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Alpaca",
+      "key": "alpaca",
+      "hosts": [
+        "alpaca.markets"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Apple",
+      "key": "apple",
+      "hosts": [
+        "apple.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Barclays",
+      "key": "barclays",
+      "hosts": [
+        "barclays.com",
+        "barclaycardus.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Bill.com",
+      "key": "bill",
+      "hosts": [
+        "bill.com"
+      ],
+      "aliases": [
+        "bill.com"
+      ],
+      "security": "high"
+    },
+    {
+      "name": "Bilt Rewards",
+      "key": "biltrewards",
+      "hosts": [
+        "biltrewards.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Carta",
+      "key": "carta",
+      "hosts": [
+        "carta.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Cash App",
+      "key": "cash app",
+      "hosts": [
+        "cash.app"
+      ],
+      "aliases": [
+        "cashapp"
+      ],
+      "security": "high"
+    },
+    {
       "name": "Chase",
       "key": "chase",
       "hosts": [
         "chase.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Wells Fargo",
-      "key": "wells fargo",
-      "hosts": [
-        "wellsfargo.com"
-      ],
-      "aliases": [
-        "wellsfargo"
-      ]
+      "aliases": [],
+      "security": "high"
     },
     {
       "name": "Citi",
@@ -75,34 +157,8 @@
       ],
       "aliases": [
         "citibank"
-      ]
-    },
-    {
-      "name": "Ally",
-      "key": "ally",
-      "hosts": [
-        "ally.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "PNC",
-      "key": "pnc",
-      "hosts": [
-        "pnc.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "TD Bank",
-      "key": "td bank",
-      "hosts": [
-        "td.com",
-        "tdbank.com"
-      ],
-      "aliases": [
-        "td"
-      ]
+      "security": "high"
     },
     {
       "name": "Citizens",
@@ -110,33 +166,85 @@
       "hosts": [
         "citizensbank.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "high"
     },
     {
-      "name": "Marcus",
-      "key": "marcus",
+      "name": "Comenity",
+      "key": "comenity",
       "hosts": [
-        "marcus.com"
+        "comenity.net"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "high"
     },
     {
-      "name": "Synchrony",
-      "key": "synchrony",
+      "name": "ConnectYourCare",
+      "key": "connectyourcare",
       "hosts": [
-        "synchrony.com",
-        "synchronybank.com"
+        "connectyourcare.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "high"
     },
     {
-      "name": "Barclays",
-      "key": "barclays",
+      "name": "Credit Karma",
+      "key": "credit karma",
       "hosts": [
-        "barclays.com",
-        "barclaycardus.com"
+        "creditkarma.com"
       ],
-      "aliases": []
+      "aliases": [
+        "creditkarma"
+      ],
+      "security": "high"
+    },
+    {
+      "name": "Dwolla",
+      "key": "dwolla",
+      "hosts": [
+        "dwolla.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Empower Retirement",
+      "key": "empower retirement",
+      "hosts": [
+        "empower-retirement.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Equifax",
+      "key": "equifax",
+      "hosts": [
+        "equifax.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "E*TRADE",
+      "key": "etrade",
+      "hosts": [
+        "etrade.com"
+      ],
+      "aliases": [
+        "e*trade",
+        "e trade"
+      ],
+      "security": "high"
+    },
+    {
+      "name": "Experian",
+      "key": "experian",
+      "hosts": [
+        "experian.com"
+      ],
+      "aliases": [],
+      "security": "high"
     },
     {
       "name": "Fidelity",
@@ -144,7 +252,164 @@
       "hosts": [
         "fidelity.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "FreeTaxUSA",
+      "key": "freetaxusa",
+      "hosts": [
+        "freetaxusa.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Gmail",
+      "key": "gmail",
+      "hosts": [
+        "gmail.com",
+        "mail.google.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Google",
+      "key": "google",
+      "hosts": [
+        "google.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "iCloud",
+      "key": "icloud",
+      "hosts": [
+        "icloud.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "InvoiceCloud",
+      "key": "invoicecloud",
+      "hosts": [
+        "invoicecloud.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "IRS",
+      "key": "irs",
+      "hosts": [
+        "irs.gov"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "J.P. Morgan",
+      "key": "jpmorgan",
+      "hosts": [
+        "jpmorgan.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Login.gov",
+      "key": "login.gov",
+      "hosts": [
+        "login.gov"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Marcus",
+      "key": "marcus",
+      "hosts": [
+        "marcus.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Müze.gov.tr",
+      "key": "muze",
+      "hosts": [
+        "muze.gov.tr"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Nelnet",
+      "key": "nelnet",
+      "hosts": [
+        "nelnet.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "NJ Courts",
+      "key": "njcourts",
+      "hosts": [
+        "njcourts.gov"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "PaymentWorks",
+      "key": "paymentworks",
+      "hosts": [
+        "paymentworks.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "PayPal",
+      "key": "paypal",
+      "hosts": [
+        "paypal.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "PNC",
+      "key": "pnc",
+      "hosts": [
+        "pnc.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Privacy.com",
+      "key": "privacy",
+      "hosts": [
+        "privacy.com"
+      ],
+      "aliases": [
+        "privacy.com"
+      ],
+      "security": "high"
+    },
+    {
+      "name": "Robinhood",
+      "key": "robinhood",
+      "hosts": [
+        "robinhood.com"
+      ],
+      "aliases": [],
+      "security": "high"
     },
     {
       "name": "Schwab",
@@ -159,69 +424,17 @@
         "ameritrade",
         "td ameritrade",
         "thinkorswim"
-      ]
+      ],
+      "security": "high"
     },
     {
-      "name": "E*TRADE",
-      "key": "etrade",
+      "name": "Slavic401k",
+      "key": "slavic401k",
       "hosts": [
-        "etrade.com"
+        "slavic401k.com"
       ],
-      "aliases": [
-        "e*trade",
-        "e trade"
-      ]
-    },
-    {
-      "name": "Robinhood",
-      "key": "robinhood",
-      "hosts": [
-        "robinhood.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "PayPal",
-      "key": "paypal",
-      "hosts": [
-        "paypal.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "Venmo",
-      "key": "venmo",
-      "hosts": [
-        "venmo.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "Cash App",
-      "key": "cash app",
-      "hosts": [
-        "cash.app"
-      ],
-      "aliases": [
-        "cashapp"
-      ]
-    },
-    {
-      "name": "Zelle",
-      "key": "zelle",
-      "hosts": [
-        "zelle.com",
-        "zellepay.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "IRS",
-      "key": "irs",
-      "hosts": [
-        "irs.gov"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "high"
     },
     {
       "name": "Social Security",
@@ -231,48 +444,182 @@
       ],
       "aliases": [
         "ssa"
-      ]
+      ],
+      "security": "high"
     },
     {
-      "name": "Apple",
-      "key": "apple",
+      "name": "StudentAid",
+      "key": "studentaid",
       "hosts": [
-        "apple.com"
+        "fafsa.ed.gov",
+        "studentaid.gov",
+        "studentloans.gov"
       ],
-      "aliases": []
+      "aliases": [
+        "fafsa",
+        "student loans",
+        "studentloans"
+      ],
+      "security": "high"
     },
     {
-      "name": "iCloud",
-      "key": "icloud",
+      "name": "SYF",
+      "key": "syf",
       "hosts": [
-        "icloud.com"
+        "syf.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "high"
     },
     {
-      "name": "Google",
-      "key": "google",
+      "name": "Synchrony",
+      "key": "synchrony",
       "hosts": [
-        "google.com"
+        "synchrony.com",
+        "synchronybank.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "high"
     },
     {
-      "name": "Gmail",
-      "key": "gmail",
+      "name": "TD Bank",
+      "key": "td bank",
       "hosts": [
-        "gmail.com",
-        "mail.google.com"
+        "td.com",
+        "tdbank.com"
       ],
-      "aliases": []
+      "aliases": [
+        "td"
+      ],
+      "security": "high"
     },
     {
-      "name": "YouTube",
-      "key": "youtube",
+      "name": "TransUnion",
+      "key": "transunion",
       "hosts": [
-        "youtube.com"
+        "transunion.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "TurboTax",
+      "key": "turbotax",
+      "hosts": [
+        "turbotax.com",
+        "turbotax.intuit.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "e-Devlet",
+      "key": "turkiye",
+      "hosts": [
+        "turkiye.gov.tr"
+      ],
+      "aliases": [
+        "e-devlet",
+        "edevlet"
+      ],
+      "security": "high"
+    },
+    {
+      "name": "Venmo",
+      "key": "venmo",
+      "hosts": [
+        "venmo.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "WageWorks",
+      "key": "wageworks",
+      "hosts": [
+        "wageworks.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Wells Fargo",
+      "key": "wells fargo",
+      "hosts": [
+        "wellsfargo.com"
+      ],
+      "aliases": [
+        "wellsfargo"
+      ],
+      "security": "high"
+    },
+    {
+      "name": "Western Union",
+      "key": "westernunion",
+      "hosts": [
+        "westernunion.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Zelle",
+      "key": "zelle",
+      "hosts": [
+        "zelle.com",
+        "zellepay.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Adobe",
+      "key": "adobe",
+      "hosts": [
+        "adobe.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Aetna",
+      "key": "aetna",
+      "hosts": [
+        "aetna.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Airbnb",
+      "key": "airbnb",
+      "hosts": [
+        "airbnb.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Alaska Airlines",
+      "key": "alaskaair",
+      "hosts": [
+        "alaskaair.com"
+      ],
+      "aliases": [
+        "alaska airlines",
+        "alaska"
+      ],
+      "security": "medium"
+    },
+    {
+      "name": "AliExpress",
+      "key": "aliexpress",
+      "hosts": [
+        "aliexpress.com",
+        "aliexpress.us"
+      ],
+      "aliases": [],
+      "security": "medium"
     },
     {
       "name": "Amazon",
@@ -280,7 +627,46 @@
       "hosts": [
         "amazon.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "American Airlines",
+      "key": "american airlines",
+      "hosts": [
+        "aa.com"
+      ],
+      "aliases": [
+        "aa"
+      ],
+      "security": "medium"
+    },
+    {
+      "name": "Atlassian",
+      "key": "atlassian",
+      "hosts": [
+        "atlassian.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Auth0",
+      "key": "auth0",
+      "hosts": [
+        "auth0.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Autodesk",
+      "key": "autodesk",
+      "hosts": [
+        "autodesk.com"
+      ],
+      "aliases": [],
+      "security": "medium"
     },
     {
       "name": "AWS",
@@ -288,7 +674,278 @@
       "hosts": [
         "aws.amazon.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Best Buy",
+      "key": "best buy",
+      "hosts": [
+        "bestbuy.com"
+      ],
+      "aliases": [
+        "bestbuy"
+      ],
+      "security": "medium"
+    },
+    {
+      "name": "Bitbucket",
+      "key": "bitbucket",
+      "hosts": [
+        "bitbucket.org"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "ChatGPT",
+      "key": "chatgpt",
+      "hosts": [
+        "chatgpt.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Chewy",
+      "key": "chewy",
+      "hosts": [
+        "chewy.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Chubb",
+      "key": "chubb",
+      "hosts": [
+        "chubb.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Cigna",
+      "key": "cigna",
+      "hosts": [
+        "cigna.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Costco",
+      "key": "costco",
+      "hosts": [
+        "costco.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Craigslist",
+      "key": "craigslist",
+      "hosts": [
+        "craigslist.org"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Delta",
+      "key": "delta",
+      "hosts": [
+        "delta.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Discord",
+      "key": "discord",
+      "hosts": [
+        "discord.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Disney",
+      "key": "disney",
+      "hosts": [
+        "go.com"
+      ],
+      "aliases": [
+        "go.com"
+      ],
+      "security": "medium"
+    },
+    {
+      "name": "Domino's",
+      "key": "dominos",
+      "hosts": [
+        "dominos.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Dropbox",
+      "key": "dropbox",
+      "hosts": [
+        "dropbox.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "eBay",
+      "key": "ebay",
+      "hosts": [
+        "ebay.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Etsy",
+      "key": "etsy",
+      "hosts": [
+        "etsy.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Expedia",
+      "key": "expedia",
+      "hosts": [
+        "expedia.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Facebook",
+      "key": "facebook",
+      "hosts": [
+        "facebook.com",
+        "messenger.com"
+      ],
+      "aliases": [
+        "messenger"
+      ],
+      "security": "medium"
+    },
+    {
+      "name": "GitHub",
+      "key": "github",
+      "hosts": [
+        "github.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Grubhub",
+      "key": "grubhub",
+      "hosts": [
+        "grubhub.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "The Home Depot",
+      "key": "homedepot",
+      "hosts": [
+        "homedepot.com"
+      ],
+      "aliases": [
+        "home depot"
+      ],
+      "security": "medium"
+    },
+    {
+      "name": "Hulu",
+      "key": "hulu",
+      "hosts": [
+        "hulu.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "IMDb",
+      "key": "imdb",
+      "hosts": [
+        "imdb.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Indeed",
+      "key": "indeed",
+      "hosts": [
+        "indeed.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Instacart",
+      "key": "instacart",
+      "hosts": [
+        "instacart.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Instagram",
+      "key": "instagram",
+      "hosts": [
+        "instagram.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Investing.com",
+      "key": "investing",
+      "hosts": [
+        "investing.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "LinkedIn",
+      "key": "linkedin",
+      "hosts": [
+        "linkedin.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Lyft",
+      "key": "lyft",
+      "hosts": [
+        "lyft.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Macy's",
+      "key": "macys",
+      "hosts": [
+        "macys.com"
+      ],
+      "aliases": [],
+      "security": "medium"
     },
     {
       "name": "Microsoft",
@@ -303,7 +960,54 @@
       ],
       "aliases": [
         "skype"
-      ]
+      ],
+      "security": "medium"
+    },
+    {
+      "name": "Monarch Money",
+      "key": "monarchmoney",
+      "hosts": [
+        "monarchmoney.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Netflix",
+      "key": "netflix",
+      "hosts": [
+        "netflix.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Notion",
+      "key": "notion",
+      "hosts": [
+        "notion.so",
+        "notion.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "OfferUp",
+      "key": "offerup",
+      "hosts": [
+        "offerup.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "OpenAI",
+      "key": "openai",
+      "hosts": [
+        "openai.com"
+      ],
+      "aliases": [],
+      "security": "medium"
     },
     {
       "name": "Outlook",
@@ -314,47 +1018,71 @@
         "outlook.office.com",
         "outlook.live.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
     },
     {
-      "name": "GitHub",
-      "key": "github",
+      "name": "Pinterest",
+      "key": "pinterest",
       "hosts": [
-        "github.com"
+        "pinterest.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
     },
     {
-      "name": "Netflix",
-      "key": "netflix",
+      "name": "Priceline",
+      "key": "priceline",
       "hosts": [
-        "netflix.com"
+        "priceline.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
     },
     {
-      "name": "Spotify",
-      "key": "spotify",
+      "name": "Progressive",
+      "key": "progressive",
       "hosts": [
-        "spotify.com"
+        "progressive.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
     },
     {
-      "name": "Dropbox",
-      "key": "dropbox",
+      "name": "Reddit",
+      "key": "reddit",
       "hosts": [
-        "dropbox.com"
+        "reddit.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
     },
     {
-      "name": "Adobe",
-      "key": "adobe",
+      "name": "Reddit Gifts",
+      "key": "redditgifts",
       "hosts": [
-        "adobe.com"
+        "redditgifts.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Ring",
+      "key": "ring",
+      "hosts": [
+        "ring.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Samsung",
+      "key": "samsung",
+      "hosts": [
+        "samsung.com"
+      ],
+      "aliases": [],
+      "security": "medium"
     },
     {
       "name": "Slack",
@@ -362,52 +1090,174 @@
       "hosts": [
         "slack.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
     },
     {
-      "name": "Notion",
-      "key": "notion",
+      "name": "Sony",
+      "key": "sony",
       "hosts": [
-        "notion.so",
-        "notion.com"
+        "sony.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
     },
     {
-      "name": "Zoom",
-      "key": "zoom",
+      "name": "Southwest",
+      "key": "southwest",
       "hosts": [
-        "zoom.us",
-        "zoom.com"
+        "southwest.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
     },
     {
-      "name": "LinkedIn",
-      "key": "linkedin",
+      "name": "Spotify",
+      "key": "spotify",
       "hosts": [
-        "linkedin.com"
+        "spotify.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
     },
     {
-      "name": "Facebook",
-      "key": "facebook",
+      "name": "Starbucks",
+      "key": "starbucks",
       "hosts": [
-        "facebook.com",
-        "messenger.com"
+        "starbucks.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Steam",
+      "key": "steam",
+      "hosts": [
+        "steampowered.com",
+        "steamcommunity.com",
+        "store.steampowered.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Stop & Shop",
+      "key": "stopandshop",
+      "hosts": [
+        "stopandshop.com"
       ],
       "aliases": [
-        "messenger"
-      ]
+        "stop and shop"
+      ],
+      "security": "medium"
     },
     {
-      "name": "Instagram",
-      "key": "instagram",
+      "name": "StubHub",
+      "key": "stubhub",
       "hosts": [
-        "instagram.com"
+        "stubhub.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Target",
+      "key": "target",
+      "hosts": [
+        "target.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Ticketmaster",
+      "key": "ticketmaster",
+      "hosts": [
+        "ticketmaster.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "TikTok",
+      "key": "tiktok",
+      "hosts": [
+        "tiktok.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "TradingView",
+      "key": "tradingview",
+      "hosts": [
+        "tradingview.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Tumblr",
+      "key": "tumblr",
+      "hosts": [
+        "tumblr.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Turkish Airlines",
+      "key": "turkishairlines",
+      "hosts": [
+        "turkishairlines.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Turo",
+      "key": "turo",
+      "hosts": [
+        "turo.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Uber",
+      "key": "uber",
+      "hosts": [
+        "uber.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "United",
+      "key": "united",
+      "hosts": [
+        "united.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Verizon",
+      "key": "verizon",
+      "hosts": [
+        "verizon.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "Walmart",
+      "key": "walmart",
+      "hosts": [
+        "walmart.com"
+      ],
+      "aliases": [],
+      "security": "medium"
     },
     {
       "name": "WhatsApp",
@@ -415,7 +1265,8 @@
       "hosts": [
         "whatsapp.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
     },
     {
       "name": "X",
@@ -426,216 +1277,57 @@
       ],
       "aliases": [
         "twitter"
-      ]
-    },
-    {
-      "name": "Reddit",
-      "key": "reddit",
-      "hosts": [
-        "reddit.com"
       ],
-      "aliases": []
+      "security": "medium"
     },
     {
-      "name": "Discord",
-      "key": "discord",
+      "name": "Xfinity",
+      "key": "xfinity",
       "hosts": [
-        "discord.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "Steam",
-      "key": "steam",
-      "hosts": [
-        "steampowered.com",
-        "steamcommunity.com",
-        "store.steampowered.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "eBay",
-      "key": "ebay",
-      "hosts": [
-        "ebay.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "Walmart",
-      "key": "walmart",
-      "hosts": [
-        "walmart.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "Target",
-      "key": "target",
-      "hosts": [
-        "target.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "Best Buy",
-      "key": "best buy",
-      "hosts": [
-        "bestbuy.com"
+        "comcast.net",
+        "xfinity.com"
       ],
       "aliases": [
-        "bestbuy"
-      ]
+        "comcast"
+      ],
+      "security": "medium"
     },
     {
-      "name": "Costco",
-      "key": "costco",
+      "name": "Yahoo",
+      "key": "yahoo",
       "hosts": [
-        "costco.com"
+        "yahoo.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
     },
     {
-      "name": "Uber",
-      "key": "uber",
+      "name": "YouTube",
+      "key": "youtube",
       "hosts": [
-        "uber.com"
+        "youtube.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
     },
     {
-      "name": "Lyft",
-      "key": "lyft",
+      "name": "Zillow",
+      "key": "zillow",
       "hosts": [
-        "lyft.com"
+        "zillow.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
     },
     {
-      "name": "Airbnb",
-      "key": "airbnb",
+      "name": "Zoom",
+      "key": "zoom",
       "hosts": [
-        "airbnb.com"
+        "zoom.us",
+        "zoom.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Delta",
-      "key": "delta",
-      "hosts": [
-        "delta.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "United",
-      "key": "united",
-      "hosts": [
-        "united.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "American Airlines",
-      "key": "american airlines",
-      "hosts": [
-        "aa.com"
-      ],
-      "aliases": [
-        "aa"
-      ]
-    },
-    {
-      "name": "Southwest",
-      "key": "southwest",
-      "hosts": [
-        "southwest.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "Expedia",
-      "key": "expedia",
-      "hosts": [
-        "expedia.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "TurboTax",
-      "key": "turbotax",
-      "hosts": [
-        "turbotax.com",
-        "turbotax.intuit.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "Credit Karma",
-      "key": "credit karma",
-      "hosts": [
-        "creditkarma.com"
-      ],
-      "aliases": [
-        "creditkarma"
-      ]
-    },
-    {
-      "name": "Equifax",
-      "key": "equifax",
-      "hosts": [
-        "equifax.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "Experian",
-      "key": "experian",
-      "hosts": [
-        "experian.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "TransUnion",
-      "key": "transunion",
-      "hosts": [
-        "transunion.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "Namecheap",
-      "key": "namecheap",
-      "hosts": [
-        "namecheap.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "Cloudflare",
-      "key": "cloudflare",
-      "hosts": [
-        "cloudflare.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "OpenAI",
-      "key": "openai",
-      "hosts": [
-        "openai.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "ChatGPT",
-      "key": "chatgpt",
-      "hosts": [
-        "chatgpt.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "medium"
     },
     {
       "name": "24 Seven Talent",
@@ -643,7 +1335,8 @@
       "hosts": [
         "24seventalent.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "360.iO",
@@ -651,7 +1344,8 @@
       "hosts": [
         "360.io"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "500px",
@@ -659,7 +1353,8 @@
       "hosts": [
         "500px.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "8tracks",
@@ -667,7 +1362,8 @@
       "hosts": [
         "8tracks.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "99designs",
@@ -675,7 +1371,8 @@
       "hosts": [
         "99designs.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "AAA",
@@ -683,7 +1380,8 @@
       "hosts": [
         "aaa.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "AAPS",
@@ -691,7 +1389,8 @@
       "hosts": [
         "aaps.org"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Ace Hardware",
@@ -699,7 +1398,8 @@
       "hosts": [
         "acehardware.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Active Communities",
@@ -707,15 +1407,8 @@
       "hosts": [
         "activecommunities.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "ADP",
-      "key": "adp",
-      "hosts": [
-        "adp.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Advance Auto Parts",
@@ -723,15 +1416,8 @@
       "hosts": [
         "advanceautoparts.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Aetna",
-      "key": "aetna",
-      "hosts": [
-        "aetna.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Aetna Vision",
@@ -739,7 +1425,8 @@
       "hosts": [
         "aetnavision.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Afraid.org",
@@ -747,27 +1434,8 @@
       "hosts": [
         "afraid.org"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Alaska Airlines",
-      "key": "alaskaair",
-      "hosts": [
-        "alaskaair.com"
-      ],
-      "aliases": [
-        "alaska airlines",
-        "alaska"
-      ]
-    },
-    {
-      "name": "AliExpress",
-      "key": "aliexpress",
-      "hosts": [
-        "aliexpress.com",
-        "aliexpress.us"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "AllyDVM",
@@ -775,15 +1443,8 @@
       "hosts": [
         "allydvm.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Alpaca",
-      "key": "alpaca",
-      "hosts": [
-        "alpaca.markets"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "AMC Theatres",
@@ -791,7 +1452,8 @@
       "hosts": [
         "amctheatres.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "American Strategic",
@@ -799,7 +1461,8 @@
       "hosts": [
         "americanstrategic.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "AngelList",
@@ -810,7 +1473,8 @@
       "aliases": [
         "angellist",
         "wellfound"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "Anywhere Dolphin",
@@ -818,7 +1482,8 @@
       "hosts": [
         "anywheredolphin.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "ASI Policy",
@@ -826,7 +1491,8 @@
       "hosts": [
         "asipolicy.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Aspen Discovery",
@@ -834,7 +1500,8 @@
       "hosts": [
         "aspendiscovery.org"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "athenahealth",
@@ -842,7 +1509,8 @@
       "hosts": [
         "athenahealth.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Atlantic Health",
@@ -850,15 +1518,8 @@
       "hosts": [
         "atlantichealth.org"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Atlassian",
-      "key": "atlassian",
-      "hosts": [
-        "atlassian.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Auphonic",
@@ -866,7 +1527,8 @@
       "hosts": [
         "auphonic.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Aura",
@@ -874,23 +1536,8 @@
       "hosts": [
         "aura.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Auth0",
-      "key": "auth0",
-      "hosts": [
-        "auth0.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "Autodesk",
-      "key": "autodesk",
-      "hosts": [
-        "autodesk.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "AutoZone",
@@ -898,7 +1545,8 @@
       "hosts": [
         "autozone.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Avanade",
@@ -906,7 +1554,8 @@
       "hosts": [
         "avanade.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Avature",
@@ -914,7 +1563,8 @@
       "hosts": [
         "avature.net"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Aventa Learning",
@@ -922,7 +1572,8 @@
       "hosts": [
         "aventalearning.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "AweRay",
@@ -930,7 +1581,8 @@
       "hosts": [
         "aweray.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Axware Systems",
@@ -938,7 +1590,8 @@
       "hosts": [
         "axwaresystems.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Bath & Body Works",
@@ -948,7 +1601,8 @@
       ],
       "aliases": [
         "bath and body works"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "BeenVerified",
@@ -956,25 +1610,8 @@
       "hosts": [
         "beenverified.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Bill.com",
-      "key": "bill",
-      "hosts": [
-        "bill.com"
-      ],
-      "aliases": [
-        "bill.com"
-      ]
-    },
-    {
-      "name": "Bilt Rewards",
-      "key": "biltrewards",
-      "hosts": [
-        "biltrewards.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "BioReference",
@@ -982,15 +1619,8 @@
       "hosts": [
         "bioreference.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Bitbucket",
-      "key": "bitbucket",
-      "hosts": [
-        "bitbucket.org"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Bitly",
@@ -998,7 +1628,8 @@
       "hosts": [
         "bitly.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Blackboard",
@@ -1006,7 +1637,8 @@
       "hosts": [
         "blackboard.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "BMW CCA",
@@ -1014,7 +1646,8 @@
       "hosts": [
         "bmwcca.org"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Brick Library",
@@ -1022,7 +1655,8 @@
       "hosts": [
         "brick-library.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Bricks in Motion",
@@ -1030,7 +1664,8 @@
       "hosts": [
         "bricksinmotion.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "BriWeb",
@@ -1038,7 +1673,8 @@
       "hosts": [
         "briweb.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "BuySub",
@@ -1046,7 +1682,8 @@
       "hosts": [
         "buysub.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "CarStickers",
@@ -1054,15 +1691,8 @@
       "hosts": [
         "carstickers.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Carta",
-      "key": "carta",
-      "hosts": [
-        "carta.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "CBS Sports",
@@ -1070,7 +1700,8 @@
       "hosts": [
         "cbssports.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "CGSociety",
@@ -1078,7 +1709,8 @@
       "hosts": [
         "cgsociety.org"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Chatbutton",
@@ -1086,7 +1718,8 @@
       "hosts": [
         "chatbutton.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Cheezburger",
@@ -1094,15 +1727,8 @@
       "hosts": [
         "cheezburger.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Chewy",
-      "key": "chewy",
-      "hosts": [
-        "chewy.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "ChowNow",
@@ -1110,23 +1736,8 @@
       "hosts": [
         "chownow.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Chubb",
-      "key": "chubb",
-      "hosts": [
-        "chubb.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "Cigna",
-      "key": "cigna",
-      "hosts": [
-        "cigna.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Cityscapes",
@@ -1134,7 +1745,8 @@
       "hosts": [
         "cityscapes-dataset.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Citysocializer",
@@ -1142,7 +1754,8 @@
       "hosts": [
         "citysocializer.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "ClassZone",
@@ -1150,7 +1763,17 @@
       "hosts": [
         "classzone.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
+    },
+    {
+      "name": "Cloudflare",
+      "key": "cloudflare",
+      "hosts": [
+        "cloudflare.com"
+      ],
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Cloudys",
@@ -1158,7 +1781,8 @@
       "hosts": [
         "cloudys.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Carnegie Mellon",
@@ -1166,7 +1790,8 @@
       "hosts": [
         "cmu.edu"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "CMU EMS",
@@ -1174,7 +1799,8 @@
       "hosts": [
         "cmuems.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "CodePen",
@@ -1182,7 +1808,8 @@
       "hosts": [
         "codepen.io"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "College Board",
@@ -1190,15 +1817,8 @@
       "hosts": [
         "collegeboard.org"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Comenity",
-      "key": "comenity",
-      "hosts": [
-        "comenity.net"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Common App",
@@ -1206,7 +1826,8 @@
       "hosts": [
         "commonapp.org"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "CommunityPass",
@@ -1214,15 +1835,8 @@
       "hosts": [
         "communitypass.net"
       ],
-      "aliases": []
-    },
-    {
-      "name": "ConnectYourCare",
-      "key": "connectyourcare",
-      "hosts": [
-        "connectyourcare.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Conservice",
@@ -1230,7 +1844,8 @@
       "hosts": [
         "conservice.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Contabo",
@@ -1238,7 +1853,8 @@
       "hosts": [
         "contabo.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Cougar Robotics",
@@ -1246,15 +1862,8 @@
       "hosts": [
         "cougarrobotics.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Craigslist",
-      "key": "craigslist",
-      "hosts": [
-        "craigslist.org"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Cronometer",
@@ -1262,7 +1871,8 @@
       "hosts": [
         "cronometer.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "CSP Racing",
@@ -1270,7 +1880,8 @@
       "hosts": [
         "cspracing.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Cursor",
@@ -1278,7 +1889,8 @@
       "hosts": [
         "cursor.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "CVS",
@@ -1286,7 +1898,8 @@
       "hosts": [
         "cvs.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Databento",
@@ -1294,7 +1907,8 @@
       "hosts": [
         "databento.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "DeepArt",
@@ -1302,7 +1916,8 @@
       "hosts": [
         "deepart.io"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Deep Dream Generator",
@@ -1310,7 +1925,8 @@
       "hosts": [
         "deepdreamgenerator.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "DeviantArt",
@@ -1318,7 +1934,8 @@
       "hosts": [
         "deviantart.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Dice",
@@ -1326,7 +1943,8 @@
       "hosts": [
         "dice.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "DirectTV",
@@ -1334,17 +1952,8 @@
       "hosts": [
         "directtv.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Disney",
-      "key": "disney",
-      "hosts": [
-        "go.com"
-      ],
-      "aliases": [
-        "go.com"
-      ]
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Docker",
@@ -1352,15 +1961,8 @@
       "hosts": [
         "docker.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Domino's",
-      "key": "dominos",
-      "hosts": [
-        "dominos.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Dribbble",
@@ -1368,7 +1970,8 @@
       "hosts": [
         "dribbble.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "DriveShare",
@@ -1376,7 +1979,8 @@
       "hosts": [
         "driveshare.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Dunkin'",
@@ -1386,15 +1990,8 @@
       ],
       "aliases": [
         "dunkin"
-      ]
-    },
-    {
-      "name": "Dwolla",
-      "key": "dwolla",
-      "hosts": [
-        "dwolla.com"
       ],
-      "aliases": []
+      "security": "low"
     },
     {
       "name": "E-on Software",
@@ -1402,7 +1999,8 @@
       "hosts": [
         "e-onsoftware.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "eClinicalWorks",
@@ -1410,7 +2008,8 @@
       "hosts": [
         "eclinicalweb.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "ECSI",
@@ -1418,7 +2017,8 @@
       "hosts": [
         "ecsi.net"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Emlid",
@@ -1426,15 +2026,8 @@
       "hosts": [
         "emlid.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Empower Retirement",
-      "key": "empower retirement",
-      "hosts": [
-        "empower-retirement.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Enterprise",
@@ -1442,7 +2035,8 @@
       "hosts": [
         "enterprise.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Equity Apartments",
@@ -1450,7 +2044,8 @@
       "hosts": [
         "equityapartments.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Essex County Parks",
@@ -1458,15 +2053,8 @@
       "hosts": [
         "essexcountyparks.org"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Etsy",
-      "key": "etsy",
-      "hosts": [
-        "etsy.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Eventbrite",
@@ -1474,7 +2062,8 @@
       "hosts": [
         "eventbrite.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Evernote",
@@ -1482,7 +2071,8 @@
       "hosts": [
         "evernote.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "E-ZPass NJ",
@@ -1493,7 +2083,8 @@
       "aliases": [
         "ezpass",
         "e-zpass"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "Family Hobbies Raceway",
@@ -1501,7 +2092,8 @@
       "hosts": [
         "familyhobbiesraceway.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Fax.plus",
@@ -1509,7 +2101,8 @@
       "hosts": [
         "fax.plus"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "FIFA",
@@ -1517,7 +2110,8 @@
       "hosts": [
         "fifa.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Filecore",
@@ -1525,7 +2119,8 @@
       "hosts": [
         "filecore.co.nz"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Finnhub",
@@ -1533,7 +2128,8 @@
       "hosts": [
         "finnhub.io"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Firestone",
@@ -1543,7 +2139,8 @@
       ],
       "aliases": [
         "firestone"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "Fitment Industries",
@@ -1551,7 +2148,8 @@
       "hosts": [
         "fitmentindustries.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Fiverr",
@@ -1559,7 +2157,8 @@
       "hosts": [
         "fiverr.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Flickr",
@@ -1567,7 +2166,8 @@
       "hosts": [
         "flickr.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Fontspring",
@@ -1575,7 +2175,8 @@
       "hosts": [
         "fontspring.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "FreeShipping.com",
@@ -1583,7 +2184,8 @@
       "hosts": [
         "freeshipping.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Freesound",
@@ -1591,15 +2193,8 @@
       "hosts": [
         "freesound.org"
       ],
-      "aliases": []
-    },
-    {
-      "name": "FreeTaxUSA",
-      "key": "freetaxusa",
-      "hosts": [
-        "freetaxusa.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Fry's",
@@ -1607,7 +2202,8 @@
       "hosts": [
         "frys.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Fubo",
@@ -1615,7 +2211,8 @@
       "hosts": [
         "fubo.tv"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Fuel Rewards",
@@ -1623,7 +2220,8 @@
       "hosts": [
         "fuelrewards.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Genero",
@@ -1631,7 +2229,8 @@
       "hosts": [
         "genero.tv"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "GeoGuessr",
@@ -1639,7 +2238,8 @@
       "hosts": [
         "geoguessr.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Glassdoor",
@@ -1647,7 +2247,8 @@
       "hosts": [
         "glassdoor.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Golan Courses",
@@ -1655,7 +2256,8 @@
       "hosts": [
         "golancourses.net"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "GovOnlineSaaS",
@@ -1663,7 +2265,8 @@
       "hosts": [
         "govonlinesaas.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Gpotato",
@@ -1671,7 +2274,8 @@
       "hosts": [
         "gpotato.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Grata",
@@ -1679,7 +2283,8 @@
       "hosts": [
         "grata.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Greyhound",
@@ -1687,7 +2292,8 @@
       "hosts": [
         "greyhound.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Groupon",
@@ -1695,15 +2301,8 @@
       "hosts": [
         "groupon.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Grubhub",
-      "key": "grubhub",
-      "hosts": [
-        "grubhub.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Gyrosco.pe",
@@ -1711,7 +2310,8 @@
       "hosts": [
         "gyrosco.pe"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Hack This Site",
@@ -1719,7 +2319,8 @@
       "hosts": [
         "hackthissite.org"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Harbor Freight",
@@ -1727,7 +2328,8 @@
       "hosts": [
         "harborfreight.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "HealthSafe ID",
@@ -1739,7 +2341,8 @@
       "aliases": [
         "optum",
         "healthsafe"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "Healthy Paws",
@@ -1747,7 +2350,8 @@
       "hosts": [
         "healthypawspetinsurance.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Alma",
@@ -1757,7 +2361,8 @@
       ],
       "aliases": [
         "alma"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "HelloFresh",
@@ -1765,7 +2370,8 @@
       "hosts": [
         "hellofresh.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Heroku",
@@ -1773,7 +2379,8 @@
       "hosts": [
         "heroku.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Hims",
@@ -1785,7 +2392,8 @@
       "aliases": [
         "forhims",
         "for hims"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "Hizal Celik",
@@ -1793,7 +2401,8 @@
       "hosts": [
         "hizalcelik.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "H&M",
@@ -1801,7 +2410,8 @@
       "hosts": [
         "hm.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Hackensack Meridian",
@@ -1811,7 +2421,8 @@
       ],
       "aliases": [
         "hackensack"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "HomeAgain",
@@ -1819,17 +2430,8 @@
       "hosts": [
         "homeagain.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "The Home Depot",
-      "key": "homedepot",
-      "hosts": [
-        "homedepot.com"
-      ],
-      "aliases": [
-        "home depot"
-      ]
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Hudson COVID Vax",
@@ -1837,15 +2439,8 @@
       "hosts": [
         "hudsoncovidvax.org"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Hulu",
-      "key": "hulu",
-      "hosts": [
-        "hulu.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "HUMed",
@@ -1853,7 +2448,8 @@
       "hosts": [
         "humed.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "IEX Cloud",
@@ -1861,7 +2457,8 @@
       "hosts": [
         "iexcloud.io"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "IFTTT",
@@ -1869,15 +2466,8 @@
       "hosts": [
         "ifttt.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "IMDb",
-      "key": "imdb",
-      "hosts": [
-        "imdb.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "iModules",
@@ -1885,7 +2475,8 @@
       "hosts": [
         "imodules.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "InboxDollars",
@@ -1893,23 +2484,8 @@
       "hosts": [
         "inboxdollars.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Indeed",
-      "key": "indeed",
-      "hosts": [
-        "indeed.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "Instacart",
-      "key": "instacart",
-      "hosts": [
-        "instacart.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Intrinio",
@@ -1917,15 +2493,8 @@
       "hosts": [
         "intrinio.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Investing.com",
-      "key": "investing",
-      "hosts": [
-        "investing.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Invisalign",
@@ -1933,15 +2502,8 @@
       "hosts": [
         "invisalign.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "InvoiceCloud",
-      "key": "invoicecloud",
-      "hosts": [
-        "invoicecloud.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "ISPE",
@@ -1949,7 +2511,8 @@
       "hosts": [
         "ispe.org"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Jibe",
@@ -1959,7 +2522,8 @@
       ],
       "aliases": [
         "jibe"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "Jobvite",
@@ -1967,7 +2531,8 @@
       "hosts": [
         "jobvite.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Honey",
@@ -1977,15 +2542,8 @@
       ],
       "aliases": [
         "honey"
-      ]
-    },
-    {
-      "name": "J.P. Morgan",
-      "key": "jpmorgan",
-      "hosts": [
-        "jpmorgan.com"
       ],
-      "aliases": []
+      "security": "low"
     },
     {
       "name": "Justworks",
@@ -1993,7 +2551,8 @@
       "hosts": [
         "justworks.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Kellogg's Family Rewards",
@@ -2001,7 +2560,8 @@
       "hosts": [
         "kelloggsfamilyrewards.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Kuula",
@@ -2009,7 +2569,8 @@
       "hosts": [
         "kuula.co"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Labcorp",
@@ -2017,7 +2578,8 @@
       "hosts": [
         "labcorp.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Last.fm",
@@ -2028,7 +2590,8 @@
       "aliases": [
         "lastfm",
         "last.fm"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "Lauren Orders",
@@ -2036,7 +2599,8 @@
       "hosts": [
         "laurenorders.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "LEGO",
@@ -2044,7 +2608,8 @@
       "hosts": [
         "lego.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Letgo",
@@ -2052,7 +2617,8 @@
       "hosts": [
         "letgo.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "LetsGetChecked",
@@ -2060,7 +2626,8 @@
       "hosts": [
         "letsgetchecked.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Liberty-Ellis Foundation",
@@ -2068,7 +2635,8 @@
       "hosts": [
         "libertyellisfoundation.org"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Lifepics",
@@ -2076,7 +2644,8 @@
       "hosts": [
         "lifepics.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Lightworks",
@@ -2084,7 +2653,8 @@
       "hosts": [
         "lightworksbeta.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Liquidnet",
@@ -2092,7 +2662,8 @@
       "hosts": [
         "liquidnet.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "littleBits",
@@ -2100,15 +2671,8 @@
       "hosts": [
         "littlebits.cc"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Login.gov",
-      "key": "login.gov",
-      "hosts": [
-        "login.gov"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Lovepop",
@@ -2116,7 +2680,8 @@
       "hosts": [
         "lovepop.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Lulu",
@@ -2124,7 +2689,8 @@
       "hosts": [
         "lulu.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "MacPaw",
@@ -2132,15 +2698,8 @@
       "hosts": [
         "macpaw.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Macy's",
-      "key": "macys",
-      "hosts": [
-        "macys.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Marketstack",
@@ -2148,7 +2707,8 @@
       "hosts": [
         "marketstack.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "McCarter Theatre",
@@ -2156,7 +2716,8 @@
       "hosts": [
         "mccarter.org"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "MealPal",
@@ -2164,7 +2725,8 @@
       "hosts": [
         "mealpal.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Meetup",
@@ -2172,7 +2734,8 @@
       "hosts": [
         "meetup.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Mercari",
@@ -2180,7 +2743,8 @@
       "hosts": [
         "mercari.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Michaels",
@@ -2188,7 +2752,8 @@
       "hosts": [
         "michaels.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Minecraft",
@@ -2199,7 +2764,8 @@
       ],
       "aliases": [
         "mojang"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "Model Mayhem",
@@ -2207,15 +2773,8 @@
       "hosts": [
         "modelmayhem.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Monarch Money",
-      "key": "monarchmoney",
-      "hosts": [
-        "monarchmoney.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Monty Fizz",
@@ -2223,7 +2782,8 @@
       "hosts": [
         "montyfizz.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Motion Array",
@@ -2231,7 +2791,8 @@
       "hosts": [
         "motionarray.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "MotionElements",
@@ -2239,7 +2800,8 @@
       "hosts": [
         "motionelements.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "MotorsportReg",
@@ -2247,7 +2809,8 @@
       "hosts": [
         "motorsportreg.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "MoviePass",
@@ -2255,7 +2818,8 @@
       "hosts": [
         "moviepass.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Montgomery Township Schools",
@@ -2263,7 +2827,8 @@
       "hosts": [
         "mtsd.k12.nj.us"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Mudo",
@@ -2271,15 +2836,8 @@
       "hosts": [
         "mudo.com.tr"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Müze.gov.tr",
-      "key": "muze",
-      "hosts": [
-        "muze.gov.tr"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "My.is",
@@ -2287,7 +2845,8 @@
       "hosts": [
         "my.is"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "MyCours",
@@ -2295,7 +2854,8 @@
       "hosts": [
         "mycours.es"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "MyGreatLakes",
@@ -2303,7 +2863,8 @@
       "hosts": [
         "mygreatlakes.org"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "My iClub Online",
@@ -2311,7 +2872,8 @@
       "hosts": [
         "myiclubonline.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "MyRegisteredSite",
@@ -2319,7 +2881,8 @@
       "hosts": [
         "myregisteredsite.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Workday",
@@ -2329,7 +2892,17 @@
       ],
       "aliases": [
         "workday"
-      ]
+      ],
+      "security": "low"
+    },
+    {
+      "name": "Namecheap",
+      "key": "namecheap",
+      "hosts": [
+        "namecheap.com"
+      ],
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Nation Safe Drivers",
@@ -2337,7 +2910,8 @@
       "hosts": [
         "nationsafedrivers.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Naviance",
@@ -2345,7 +2919,8 @@
       "hosts": [
         "naviance.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "NavSpark Forum",
@@ -2353,15 +2928,8 @@
       "hosts": [
         "navsparkforum.com.tw"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Nelnet",
-      "key": "nelnet",
-      "hosts": [
-        "nelnet.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "NETGEAR",
@@ -2369,7 +2937,8 @@
       "hosts": [
         "netgear.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Network Solutions",
@@ -2377,7 +2946,8 @@
       "hosts": [
         "networksolutions.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "The New Yorker",
@@ -2387,7 +2957,8 @@
       ],
       "aliases": [
         "new yorker"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "NextGen",
@@ -2395,7 +2966,8 @@
       "hosts": [
         "nextgen.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "ngrok",
@@ -2403,7 +2975,8 @@
       "hosts": [
         "ngrok.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Niche",
@@ -2411,15 +2984,8 @@
       "hosts": [
         "niche.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "NJ Courts",
-      "key": "njcourts",
-      "hosts": [
-        "njcourts.gov"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "NJ Transit",
@@ -2427,7 +2993,8 @@
       "hosts": [
         "njtransit.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "NordVPN",
@@ -2439,7 +3006,8 @@
       "aliases": [
         "nordaccount",
         "nord"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "New York Philharmonic",
@@ -2447,7 +3015,8 @@
       "hosts": [
         "nyphil.org"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "NYPL",
@@ -2455,7 +3024,8 @@
       "hosts": [
         "nypl.org"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "The New York Times",
@@ -2466,15 +3036,8 @@
       "aliases": [
         "nyt",
         "new york times"
-      ]
-    },
-    {
-      "name": "OfferUp",
-      "key": "offerup",
-      "hosts": [
-        "offerup.com"
       ],
-      "aliases": []
+      "security": "low"
     },
     {
       "name": "OnlineBeta",
@@ -2482,7 +3045,8 @@
       "hosts": [
         "onlinebeta.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Online School Solutions",
@@ -2490,7 +3054,8 @@
       "hosts": [
         "onlineschoolsolutions.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Online Video Contests",
@@ -2498,7 +3063,8 @@
       "hosts": [
         "onlinevideocontests.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Onnit",
@@ -2506,7 +3072,8 @@
       "hosts": [
         "onnit.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "OnTheHub",
@@ -2514,7 +3081,8 @@
       "hosts": [
         "onthehub.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "OpenGuessr",
@@ -2522,7 +3090,8 @@
       "hosts": [
         "openguessr.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "OrderSnapp",
@@ -2530,7 +3099,8 @@
       "hosts": [
         "ordersnapp.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Ostagram",
@@ -2538,7 +3108,8 @@
       "hosts": [
         "ostagram.me"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Pandora",
@@ -2546,7 +3117,8 @@
       "hosts": [
         "pandora.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Paperspace",
@@ -2554,7 +3126,8 @@
       "hosts": [
         "paperspace.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "ParkMobile",
@@ -2563,7 +3136,8 @@
         "parkmobile.io",
         "parkmobile.us"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Pastebin",
@@ -2571,7 +3145,8 @@
       "hosts": [
         "pastebin.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Patient Bill Help",
@@ -2579,7 +3154,8 @@
       "hosts": [
         "patientbillhelp.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Pawp",
@@ -2587,15 +3163,8 @@
       "hosts": [
         "pawp.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "PaymentWorks",
-      "key": "paymentworks",
-      "hosts": [
-        "paymentworks.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "PBS",
@@ -2603,7 +3172,8 @@
       "hosts": [
         "pbs.org"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Peacock",
@@ -2613,7 +3183,8 @@
       ],
       "aliases": [
         "peacock"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "PetScreening",
@@ -2621,7 +3192,8 @@
       "hosts": [
         "petscreening.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "PetSmart",
@@ -2629,7 +3201,8 @@
       "hosts": [
         "petsmart.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "PharmaceLik",
@@ -2637,7 +3210,8 @@
       "hosts": [
         "pharmacelik.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Piazza",
@@ -2645,15 +3219,8 @@
       "hosts": [
         "piazza.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Pinterest",
-      "key": "pinterest",
-      "hosts": [
-        "pinterest.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Pirate Ship",
@@ -2663,7 +3230,8 @@
       ],
       "aliases": [
         "pirate ship"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "Pixabay",
@@ -2671,7 +3239,8 @@
       "hosts": [
         "pixabay.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Pixieset",
@@ -2679,7 +3248,8 @@
       "hosts": [
         "pixieset.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Plex",
@@ -2687,7 +3257,8 @@
       "hosts": [
         "plex.tv"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Postmates",
@@ -2695,7 +3266,8 @@
       "hosts": [
         "postmates.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Potbelly",
@@ -2703,7 +3275,8 @@
       "hosts": [
         "potbelly.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Pottermore",
@@ -2711,7 +3284,8 @@
       "hosts": [
         "pottermore.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Prezi",
@@ -2719,15 +3293,8 @@
       "hosts": [
         "prezi.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Priceline",
-      "key": "priceline",
-      "hosts": [
-        "priceline.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Price Series",
@@ -2735,17 +3302,8 @@
       "hosts": [
         "priceseries.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Privacy.com",
-      "key": "privacy",
-      "hosts": [
-        "privacy.com"
-      ],
-      "aliases": [
-        "privacy.com"
-      ]
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Processing",
@@ -2753,7 +3311,8 @@
       "hosts": [
         "processing.org"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Profiles AC",
@@ -2761,15 +3320,8 @@
       "hosts": [
         "profilesac.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Progressive",
-      "key": "progressive",
-      "hosts": [
-        "progressive.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "PSEG",
@@ -2777,7 +3329,8 @@
       "hosts": [
         "pseg.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "PVA Guys",
@@ -2785,7 +3338,8 @@
       "hosts": [
         "pvaguys.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Quest Diagnostics",
@@ -2796,7 +3350,8 @@
       "aliases": [
         "quest diagnostics",
         "quest"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "Questia School",
@@ -2804,7 +3359,8 @@
       "hosts": [
         "questiaschool.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Quia",
@@ -2812,7 +3368,8 @@
       "hosts": [
         "quia.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Quipu Group",
@@ -2820,7 +3377,8 @@
       "hosts": [
         "quipugroup.net"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Rayne Nutrition",
@@ -2828,15 +3386,8 @@
       "hosts": [
         "raynenutrition.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Reddit Gifts",
-      "key": "redditgifts",
-      "hosts": [
-        "redditgifts.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Regal",
@@ -2846,7 +3397,8 @@
       ],
       "aliases": [
         "regal"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "RescueTime",
@@ -2854,7 +3406,8 @@
       "hosts": [
         "rescuetime.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Restore",
@@ -2862,7 +3415,8 @@
       "hosts": [
         "restore.media"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Review Star Wars",
@@ -2870,7 +3424,8 @@
       "hosts": [
         "reviewstarwars.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Revolution Prep",
@@ -2878,15 +3433,8 @@
       "hosts": [
         "revolutionprep.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Ring",
-      "key": "ring",
-      "hosts": [
-        "ring.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "RockAuto",
@@ -2894,7 +3442,8 @@
       "hosts": [
         "rockauto.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Rockler",
@@ -2902,7 +3451,8 @@
       "hosts": [
         "rockler.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Rockstar Games",
@@ -2912,7 +3462,8 @@
       ],
       "aliases": [
         "rockstar"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "Roku",
@@ -2920,7 +3471,8 @@
       "hosts": [
         "roku.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Rooster Teeth",
@@ -2928,7 +3480,8 @@
       "hosts": [
         "roosterteeth.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "RumbleTalk",
@@ -2937,7 +3490,8 @@
         "rumbletalk.com",
         "rumbletalk.net"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Rutgers",
@@ -2945,7 +3499,8 @@
       "hosts": [
         "rutgers.edu"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Ryobi",
@@ -2955,7 +3510,8 @@
       ],
       "aliases": [
         "ryobi"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "Sakari",
@@ -2963,15 +3519,8 @@
       "hosts": [
         "sakari.io"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Samsung",
-      "key": "samsung",
-      "hosts": [
-        "samsung.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Scholarship Experts",
@@ -2979,7 +3528,8 @@
       "hosts": [
         "scholarshipexperts.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Scholarship Points",
@@ -2987,7 +3537,8 @@
       "hosts": [
         "scholarshippoints.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Scholarships.com",
@@ -2995,7 +3546,8 @@
       "hosts": [
         "scholarships.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Second in Seconds",
@@ -3003,7 +3555,8 @@
       "hosts": [
         "secondinseconds.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "SendGrid",
@@ -3011,7 +3564,8 @@
       "hosts": [
         "sendgrid.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "SendThisFile",
@@ -3019,7 +3573,8 @@
       "hosts": [
         "sendthisfile.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Sharebite",
@@ -3027,7 +3582,8 @@
       "hosts": [
         "sharebite.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "ShareFile",
@@ -3036,7 +3592,8 @@
         "sharefile.com",
         "sharefile.io"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Shiftboard",
@@ -3044,7 +3601,8 @@
       "hosts": [
         "shiftboard.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "FIGS",
@@ -3054,7 +3612,8 @@
       ],
       "aliases": [
         "figs"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "Shutterfly",
@@ -3062,7 +3621,8 @@
       "hosts": [
         "shutterfly.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Simply Maya",
@@ -3070,7 +3630,8 @@
       "hosts": [
         "simplymaya.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "SiteRubix",
@@ -3078,7 +3639,8 @@
       "hosts": [
         "siterubix.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Sixa",
@@ -3086,7 +3648,8 @@
       "hosts": [
         "sixa.io"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Sketchfab",
@@ -3094,15 +3657,8 @@
       "hosts": [
         "sketchfab.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Slavic401k",
-      "key": "slavic401k",
-      "hosts": [
-        "slavic401k.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Slice the Pie",
@@ -3110,7 +3666,8 @@
       "hosts": [
         "slicethepie.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Sling",
@@ -3118,7 +3675,8 @@
       "hosts": [
         "sling.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Smart911",
@@ -3126,7 +3684,8 @@
       "hosts": [
         "smart911.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "SmartRent",
@@ -3134,7 +3693,8 @@
       "hosts": [
         "smartrent.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "SMS-Man",
@@ -3142,7 +3702,8 @@
       "hosts": [
         "sms-man.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Somerset County Library",
@@ -3150,7 +3711,8 @@
       "hosts": [
         "somerset.lib.nj.us"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Sona Systems",
@@ -3158,15 +3720,8 @@
       "hosts": [
         "sona-systems.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Sony",
-      "key": "sony",
-      "hosts": [
-        "sony.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "SparkFun",
@@ -3174,7 +3729,8 @@
       "hosts": [
         "sparkfun.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "SpotHero",
@@ -3182,7 +3738,8 @@
       "hosts": [
         "spothero.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Stack Overflow",
@@ -3194,15 +3751,8 @@
       "aliases": [
         "stack exchange",
         "stackexchange"
-      ]
-    },
-    {
-      "name": "Starbucks",
-      "key": "starbucks",
-      "hosts": [
-        "starbucks.com"
       ],
-      "aliases": []
+      "security": "low"
     },
     {
       "name": "Statue of Liberty",
@@ -3212,7 +3762,8 @@
       ],
       "aliases": [
         "statue of liberty"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "Sticker Mule",
@@ -3220,7 +3771,8 @@
       "hosts": [
         "stickermule.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Stockhoot",
@@ -3228,7 +3780,8 @@
       "hosts": [
         "stockhoot.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Stocktwits",
@@ -3236,17 +3789,8 @@
       "hosts": [
         "stocktwits.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Stop & Shop",
-      "key": "stopandshop",
-      "hosts": [
-        "stopandshop.com"
-      ],
-      "aliases": [
-        "stop and shop"
-      ]
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Strongflex",
@@ -3254,29 +3798,8 @@
       "hosts": [
         "strongflex.us"
       ],
-      "aliases": []
-    },
-    {
-      "name": "StubHub",
-      "key": "stubhub",
-      "hosts": [
-        "stubhub.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "StudentAid",
-      "key": "studentaid",
-      "hosts": [
-        "fafsa.ed.gov",
-        "studentaid.gov",
-        "studentloans.gov"
-      ],
-      "aliases": [
-        "fafsa",
-        "student loans",
-        "studentloans"
-      ]
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "SuperSaaS",
@@ -3284,15 +3807,8 @@
       "hosts": [
         "supersaas.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "SYF",
-      "key": "syf",
-      "hosts": [
-        "syf.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Symplicity",
@@ -3300,7 +3816,8 @@
       "hosts": [
         "symplicity.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "T2 Systems",
@@ -3310,7 +3827,8 @@
       ],
       "aliases": [
         "t2"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "TeamViewer",
@@ -3318,7 +3836,8 @@
       "hosts": [
         "teamviewer.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "TED",
@@ -3326,7 +3845,8 @@
       "hosts": [
         "ted.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Teladoc",
@@ -3334,7 +3854,8 @@
       "hosts": [
         "teladoc.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Telecharge",
@@ -3342,7 +3863,8 @@
       "hosts": [
         "telecharge.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Temboo",
@@ -3350,7 +3872,8 @@
       "hosts": [
         "temboo.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Temple University",
@@ -3358,7 +3881,8 @@
       "hosts": [
         "temple.edu"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "The Cheesecake Factory",
@@ -3368,7 +3892,8 @@
       ],
       "aliases": [
         "cheesecake factory"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "Thumbtack",
@@ -3376,23 +3901,8 @@
       "hosts": [
         "thumbtack.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Ticketmaster",
-      "key": "ticketmaster",
-      "hosts": [
-        "ticketmaster.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "TikTok",
-      "key": "tiktok",
-      "hosts": [
-        "tiktok.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Tire Rack",
@@ -3400,7 +3910,8 @@
       "hosts": [
         "tirerack.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Trade the Trend",
@@ -3408,15 +3919,8 @@
       "hosts": [
         "tradethetrend.guru"
       ],
-      "aliases": []
-    },
-    {
-      "name": "TradingView",
-      "key": "tradingview",
-      "hosts": [
-        "tradingview.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Trakt",
@@ -3424,7 +3928,8 @@
       "hosts": [
         "trakt.tv"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Trellis",
@@ -3432,7 +3937,8 @@
       "hosts": [
         "trellis.law"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Tripadvisor",
@@ -3440,7 +3946,8 @@
       "hosts": [
         "tripadvisor.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "TrustArts",
@@ -3448,42 +3955,8 @@
       "hosts": [
         "trustarts.org"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Tumblr",
-      "key": "tumblr",
-      "hosts": [
-        "tumblr.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "Turkish Airlines",
-      "key": "turkishairlines",
-      "hosts": [
-        "turkishairlines.com"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "e-Devlet",
-      "key": "turkiye",
-      "hosts": [
-        "turkiye.gov.tr"
-      ],
-      "aliases": [
-        "e-devlet",
-        "edevlet"
-      ]
-    },
-    {
-      "name": "Turo",
-      "key": "turo",
-      "hosts": [
-        "turo.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Universal Life Church",
@@ -3491,7 +3964,8 @@
       "hosts": [
         "ulc.org"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "University of Michigan",
@@ -3499,7 +3973,8 @@
       "hosts": [
         "umich.edu"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Unique Photo",
@@ -3507,7 +3982,8 @@
       "hosts": [
         "uniquephoto.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Unity",
@@ -3515,7 +3991,8 @@
       "hosts": [
         "unity.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "University of California",
@@ -3523,7 +4000,8 @@
       "hosts": [
         "universityofcalifornia.edu"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Uppbeat",
@@ -3531,7 +4009,8 @@
       "hosts": [
         "uppbeat.io"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "UPrinting",
@@ -3539,7 +4018,8 @@
       "hosts": [
         "uprinting.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "UPS",
@@ -3547,7 +4027,8 @@
       "hosts": [
         "ups.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "UserStyles",
@@ -3555,7 +4036,8 @@
       "hosts": [
         "userstyles.org"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "USPS",
@@ -3563,7 +4045,8 @@
       "hosts": [
         "usps.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "UWebWeb",
@@ -3571,7 +4054,8 @@
       "hosts": [
         "uwebweb.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Vault Health",
@@ -3579,15 +4063,8 @@
       "hosts": [
         "vaulthealth.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Verizon",
-      "key": "verizon",
-      "hosts": [
-        "verizon.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Vets First Choice",
@@ -3595,7 +4072,8 @@
       "hosts": [
         "vetsfirstchoice.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Video Copilot",
@@ -3603,7 +4081,8 @@
       "hosts": [
         "videocopilot.net"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Vimeo",
@@ -3611,7 +4090,8 @@
       "hosts": [
         "vimeo.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Volatility Trading Strategies",
@@ -3619,7 +4099,8 @@
       "hosts": [
         "volatilitytradingstrategies.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "VSP",
@@ -3627,15 +4108,8 @@
       "hosts": [
         "vsp.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "WageWorks",
-      "key": "wageworks",
-      "hosts": [
-        "wageworks.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Wakefern",
@@ -3643,7 +4117,8 @@
       "hosts": [
         "wakefern.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Walgreens",
@@ -3651,7 +4126,8 @@
       "hosts": [
         "walgreens.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Warby Parker",
@@ -3661,7 +4137,8 @@
       ],
       "aliases": [
         "warby parker"
-      ]
+      ],
+      "security": "low"
     },
     {
       "name": "We.id",
@@ -3669,7 +4146,8 @@
       "hosts": [
         "we.id"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Wealthy Affiliate",
@@ -3677,7 +4155,8 @@
       "hosts": [
         "wealthyaffiliate.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Web Hosting",
@@ -3685,7 +4164,8 @@
       "hosts": [
         "web-hosting.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Web.com",
@@ -3693,7 +4173,8 @@
       "hosts": [
         "web.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Webhost.al",
@@ -3701,7 +4182,8 @@
       "hosts": [
         "webhost.al"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "WebHost.al",
@@ -3709,7 +4191,8 @@
       "hosts": [
         "webhostal.net"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "We Got Pop",
@@ -3717,7 +4200,8 @@
       "hosts": [
         "wegotpop.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "WeSeed",
@@ -3725,15 +4209,8 @@
       "hosts": [
         "weseed.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Western Union",
-      "key": "westernunion",
-      "hosts": [
-        "westernunion.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "WeWork",
@@ -3741,7 +4218,8 @@
       "hosts": [
         "wework.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "WIRED",
@@ -3749,7 +4227,8 @@
       "hosts": [
         "wired.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "University of Wisconsin",
@@ -3757,7 +4236,8 @@
       "hosts": [
         "wisconsin.edu"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Wish",
@@ -3765,7 +4245,8 @@
       "hosts": [
         "wish.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "WordPress",
@@ -3773,26 +4254,8 @@
       "hosts": [
         "wordpress.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Xfinity",
-      "key": "xfinity",
-      "hosts": [
-        "comcast.net",
-        "xfinity.com"
-      ],
-      "aliases": [
-        "comcast"
-      ]
-    },
-    {
-      "name": "Yahoo",
-      "key": "yahoo",
-      "hosts": [
-        "yahoo.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "YouPet",
@@ -3800,7 +4263,8 @@
       "hosts": [
         "youpet.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Z1 Motorsports",
@@ -3808,7 +4272,8 @@
       "hosts": [
         "z1motorsports.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Zenobase",
@@ -3816,7 +4281,8 @@
       "hosts": [
         "zenobase.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Zenwork",
@@ -3824,15 +4290,8 @@
       "hosts": [
         "zenwork.com"
       ],
-      "aliases": []
-    },
-    {
-      "name": "Zillow",
-      "key": "zillow",
-      "hosts": [
-        "zillow.com"
-      ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Zipcar",
@@ -3840,7 +4299,8 @@
       "hosts": [
         "zipcar.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "Zocdoc",
@@ -3848,7 +4308,8 @@
       "hosts": [
         "zocdoc.com"
       ],
-      "aliases": []
+      "aliases": [],
+      "security": "low"
     }
   ]
 }

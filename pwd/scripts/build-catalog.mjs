@@ -35,6 +35,7 @@ console.log(
 function catalogContent(value) {
   return JSON.stringify({
     schema: value.schema,
+    securityTierOrder: value.securityTierOrder,
     favorites: value.favorites,
     compoundSuffixes: value.compoundSuffixes,
     hostPrefixes: value.hostPrefixes,
