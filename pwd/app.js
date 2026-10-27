@@ -155,6 +155,17 @@ function focusInitial() {
   else focusPhrase();
 }
 
+/** Passphrase is the first field; focus it before async boot so the site combobox does not. */
+function queueInitialPhraseFocus() {
+  if (shouldLockPassphrase()) return;
+  const tryFocus = () => {
+    if (shouldLockPassphrase() || focusMovedByUser()) return;
+    focusPhrase();
+  };
+  tryFocus();
+  requestAnimationFrame(tryFocus);
+}
+
 /** True once the user has put focus somewhere other than the initial field. */
 function focusMovedByUser() {
   const active = document.activeElement;
@@ -299,6 +310,7 @@ passwordEl.addEventListener("keydown", (event) => {
 installDeferredAutoCopyFlush();
 
 renderMenu();
+queueInitialPhraseFocus();
 const booted = boot();
 registerServiceWorkerWhenIdle();
 

@@ -82,8 +82,15 @@ const label = () => page.locator("#version").textContent();
 const menuItems = () => page.evaluate(() => [...document.querySelectorAll("#version-menu button")]
   .map((button) => `${button.textContent}${button.getAttribute("aria-selected") === "true" ? "*" : ""}`));
 
-console.log("Layout");
+console.log("Initial focus");
 await load();
+await page.waitForFunction(() => document.activeElement?.id === "phrase", null, { timeout: 5000 });
+check(
+  await page.evaluate(() => document.activeElement?.id === "phrase"),
+  "passphrase focused when the site opens",
+);
+
+console.log("Layout");
 check(await label() === "v1" && !(await page.locator("#version").isDisabled()), "shows v1 and stays enabled before a site is entered");
 await page.click("#version");
 check(JSON.stringify(await menuItems()) === JSON.stringify(["v1current*", "v2alternative"]), `v1/v2 menu without site (${(await menuItems()).join(", ")})`);

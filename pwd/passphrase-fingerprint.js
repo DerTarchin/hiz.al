@@ -1,11 +1,29 @@
-const NEUTRAL = 18;
 const POINTS = 12;
-const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const RAW_BUCKETS = 36;
+const BAND_COUNT = 5;
+/** Inward bands 0–1, neutral 2, outward bands 3–4. */
+const NEUTRAL_BAND = 2;
+const NEUTRAL = 18;
+/** Legacy radii samples: same min/neutral/max spread as the old 0..35 scale. */
+const BAND_LEGACY = [0, 12, 18, 24, 35];
 
-/** Deterministic 12 values in 0..35 from the passphrase (not cryptographic). */
-export function passphraseFingerprintValues(passphrase) {
+/** Map a raw 0..35 draw into one of five bands. */
+export function rawIndexToBand(raw) {
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return NEUTRAL_BAND;
+  const clamped = Math.min(RAW_BUCKETS - 1, Math.max(0, Math.floor(n)));
+  return Math.min(BAND_COUNT - 1, Math.floor((clamped * BAND_COUNT) / RAW_BUCKETS));
+}
+
+export function bandToLegacyValue(band) {
+  const b = Math.min(BAND_COUNT - 1, Math.max(0, Math.floor(band)));
+  return BAND_LEGACY[b];
+}
+
+/** Deterministic 12 band indices in 0..4 from the passphrase (not cryptographic). */
+export function passphraseFingerprintBands(passphrase) {
   const text = String(passphrase ?? "").normalize("NFC").toLowerCase();
-  if (!text) return Array(POINTS).fill(NEUTRAL);
+  if (!text) return Array(POINTS).fill(NEUTRAL_BAND);
 
   let h = 2166136261;
   for (let i = 0; i < text.length; i += 1) {
@@ -13,20 +31,23 @@ export function passphraseFingerprintValues(passphrase) {
     h = Math.imul(h, 16777619);
   }
 
-  const values = [];
+  const bands = [];
   for (let i = 0; i < POINTS; i += 1) {
     h = Math.imul(h ^ Math.imul(i + 1, 2654435761), 2246822519);
     h ^= h >>> 16;
-    values.push((h >>> 0) % 36);
+    bands.push(rawIndexToBand((h >>> 0) % RAW_BUCKETS));
   }
-  return values;
+  return bands;
 }
 
-/** 12-char alphanumeric fingerprint (for debugging / display if needed). */
+/** Values passed to the path renderer (discrete legacy radii, not 0..35). */
+export function passphraseFingerprintValues(passphrase) {
+  return passphraseFingerprintBands(passphrase).map(bandToLegacyValue);
+}
+
+/** 12-char band fingerprint (0–4, for debugging). */
 export function passphraseFingerprintHash(passphrase) {
-  return passphraseFingerprintValues(passphrase)
-    .map((v) => CHARSET[v])
-    .join("");
+  return passphraseFingerprintBands(passphrase).map(String).join("");
 }
 
 function radiusFactor(value) {
