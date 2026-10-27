@@ -4,7 +4,7 @@ const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 /** Deterministic 12 values in 0..35 from the passphrase (not cryptographic). */
 export function passphraseFingerprintValues(passphrase) {
-  const text = String(passphrase ?? "").normalize("NFC");
+  const text = String(passphrase ?? "").normalize("NFC").toLowerCase();
   if (!text) return Array(POINTS).fill(NEUTRAL);
 
   let h = 2166136261;

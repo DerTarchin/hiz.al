@@ -2,6 +2,7 @@ import {
   DEFAULT_SITE_VERSION,
   FORMAT_VERSION,
   deriveMasterKey,
+  normalizePassphrase,
   normalizeSiteVersion,
   passwordFromMaster,
 } from "./derive.js";
@@ -672,7 +673,7 @@ async function generate({ commit = false, copy = false } = {}) {
 }
 
 async function masterKey() {
-  const phrase = phraseInput.value.normalize("NFC");
+  const phrase = normalizePassphrase(phraseInput.value);
   if (phrase) {
     if (sessionKey && sessionPhrase === phrase) return sessionKey;
     if (pendingDerive?.phrase !== phrase) {
@@ -1305,7 +1306,7 @@ async function enableRemember() {
   }
   const previous = savedRecord;
   prfWrap = { credentialId: record.credentialId, key: enrolled.key };
-  const phrase = phraseInput.value.normalize("NFC");
+  const phrase = normalizePassphrase(phraseInput.value);
   const key = sessionKey && (!phrase || phrase === sessionPhrase) ? sessionKey : null;
   const next = key
     ? { ...record, format: FORMAT_VERSION, ...(await sealMasterKey(key, enrolled.key)) }

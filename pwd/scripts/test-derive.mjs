@@ -19,6 +19,7 @@ const {
   deriveMasterKey,
   encodeFromStream,
   encodePassword,
+  normalizePassphrase,
   normalizeSiteVersion,
   passwordFromMaster,
 } = await import(pathToFileURL(join(root, "derive.js")).href);
@@ -109,6 +110,21 @@ console.log("KDF worker");
   check(
     Boolean(nfc?.ok) && Buffer.from(nfc.key).equals(Buffer.from(await deriveMasterKey("caf\u00e9 au lait"))),
     "worker NFC-normalizes the passphrase like derive.js",
+  );
+
+  check(
+    normalizePassphrase("Test-Passphrase") === "test-passphrase",
+    "normalizePassphrase lowercases after NFC",
+  );
+  check(
+    Buffer.from(await deriveMasterKey("Test-Passphrase")).equals(Buffer.from(masters.get("test-passphrase"))),
+    "passphrase case does not change the master key",
+  );
+  await worker.runKdfJob({ id: 5, phrase: "Test-Passphrase" });
+  const caseMix = posted.find((m) => m.id === 5);
+  check(
+    Boolean(caseMix?.ok) && Buffer.from(caseMix.key).equals(Buffer.from(masters.get("test-passphrase"))),
+    "worker lowercases the passphrase like derive.js",
   );
 
   await worker.runKdfJob({ id: 4, phrase: "" });

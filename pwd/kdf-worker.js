@@ -20,7 +20,7 @@ async function runKdfJob(data) {
   try {
     const fn = self.hashwasm?.argon2id;
     if (!fn) throw new Error("Argon2id is unavailable in this browser");
-    const normalized = String(phrase ?? "").normalize("NFC");
+    const normalized = String(phrase ?? "").normalize("NFC").toLowerCase();
     if (!normalized) throw new Error("Passphrase is empty");
     const hash = await fn({
       password: normalized,

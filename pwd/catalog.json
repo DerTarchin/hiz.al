@@ -78,7 +78,7 @@
         "alpaca.markets"
       ],
       "aliases": [],
-      "security": "high"
+      "security": "medium"
     },
     {
       "name": "Apple",
