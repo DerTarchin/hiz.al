@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": 2026102602,
+  "revision": 2026102901,
   "securityTierOrder": [
     "high",
     "medium",
@@ -70,15 +70,6 @@
       ],
       "aliases": [],
       "security": "high"
-    },
-    {
-      "name": "Alpaca",
-      "key": "alpaca",
-      "hosts": [
-        "alpaca.markets"
-      ],
-      "aliases": [],
-      "security": "medium"
     },
     {
       "name": "Apple",
@@ -196,15 +187,6 @@
       "aliases": [
         "creditkarma"
       ],
-      "security": "high"
-    },
-    {
-      "name": "Dwolla",
-      "key": "dwolla",
-      "hosts": [
-        "dwolla.com"
-      ],
-      "aliases": [],
       "security": "high"
     },
     {
@@ -338,28 +320,10 @@
       "security": "high"
     },
     {
-      "name": "Müze.gov.tr",
-      "key": "muze",
-      "hosts": [
-        "muze.gov.tr"
-      ],
-      "aliases": [],
-      "security": "high"
-    },
-    {
       "name": "Nelnet",
       "key": "nelnet",
       "hosts": [
         "nelnet.com"
-      ],
-      "aliases": [],
-      "security": "high"
-    },
-    {
-      "name": "NJ Courts",
-      "key": "njcourts",
-      "hosts": [
-        "njcourts.gov"
       ],
       "aliases": [],
       "security": "high"
@@ -571,6 +535,24 @@
       ],
       "aliases": [],
       "security": "high"
+    },
+    {
+      "name": "Alpaca",
+      "key": "alpaca",
+      "hosts": [
+        "alpaca.markets"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "NJ Courts",
+      "key": "njcourts",
+      "hosts": [
+        "njcourts.gov"
+      ],
+      "aliases": [],
+      "security": "medium"
     },
     {
       "name": "Adobe",
@@ -1328,6 +1310,15 @@
       ],
       "aliases": [],
       "security": "medium"
+    },
+    {
+      "name": "Müze.gov.tr",
+      "key": "muze",
+      "hosts": [
+        "muze.gov.tr"
+      ],
+      "aliases": [],
+      "security": "low"
     },
     {
       "name": "24 Seven Talent",

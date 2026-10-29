@@ -19,10 +19,12 @@ const {
   deriveMasterKey,
   encodeFromStream,
   encodePassword,
+  encodePasswordPnc,
   normalizePassphrase,
   normalizeSiteVersion,
   passwordFromMaster,
 } = await import(pathToFileURL(join(root, "derive.js")).href);
+const { isValidPncPassword } = await import(pathToFileURL(join(root, "site-requirements.js")).href);
 
 let failures = 0;
 function check(condition, message) {
@@ -35,6 +37,7 @@ const VECTORS = [
   ["test-passphrase", "amazon", 2, "08MQKwQCHVr!F1sdJ"],
   ["test-passphrase", "wells fargo", 1, "lS7o!ftVoC7aSzYEH"],
   ["correct horse battery staple", "chase", 1, "Sz2MQ2CYC!FZvoLdc"],
+  ["test-passphrase", "pnc", 1, "Kb7pe)n*1Od6kJGPO"],
 ];
 
 console.log("KDF parameters");
@@ -46,6 +49,7 @@ for (const [phrase, site, version, expected] of VECTORS) {
   if (!masters.has(phrase)) masters.set(phrase, await deriveMasterKey(phrase));
   const password = await passwordFromMaster(masters.get(phrase), site, version);
   check(password === expected, `${site} v${version} -> ${password}`);
+  if (site === "pnc") check(isValidPncPassword(password), `pnc v${version} satisfies PNC policy`);
 }
 
 console.log("Per-site version");
@@ -143,6 +147,17 @@ for (let i = 0; i < 20000; i += 1) {
   }
 }
 check(shapeOk, "17 chars with lower, upper, digit, and exactly one !");
+
+console.log("PNC encoder");
+let pncOk = true;
+for (let i = 0; i < 20000; i += 1) {
+  const password = encodePasswordPnc(new Uint8Array(randomBytes(64)));
+  if (!isValidPncPassword(password)) {
+    pncOk = false;
+    break;
+  }
+}
+check(pncOk, "PNC policy holds for 20000 random 64-byte streams");
 
 console.log("Entropy exhaustion");
 let exhausted64 = 0;

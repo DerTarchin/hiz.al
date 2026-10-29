@@ -1,4 +1,4 @@
-const CACHE = "pwd-shell-53";
+const CACHE = "pwd-shell-54";
 const NETWORK_TIMEOUT_MS = 2500;
 
 // Only what the app needs to run offline. Icons and iOS splash screens (about
@@ -10,6 +10,7 @@ const ASSETS = [
   "./app.css",
   "./app.js",
   "./derive.js",
+  "./site-requirements.js",
   "./sites.js",
   "./site-registry.js",
   "./passphrase-fingerprint.js",
