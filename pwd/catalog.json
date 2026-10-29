@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": 2026102902,
+  "revision": 2026102903,
   "securityTierOrder": [
     "high",
     "medium",
@@ -394,21 +394,6 @@
       "security": "high"
     },
     {
-      "name": "StudentAid",
-      "key": "studentaid",
-      "hosts": [
-        "fafsa.ed.gov",
-        "studentaid.gov",
-        "studentloans.gov"
-      ],
-      "aliases": [
-        "fafsa",
-        "student loans",
-        "studentloans"
-      ],
-      "security": "high"
-    },
-    {
       "name": "Synchrony",
       "key": "synchrony",
       "hosts": [
@@ -496,16 +481,6 @@
       "key": "westernunion",
       "hosts": [
         "westernunion.com"
-      ],
-      "aliases": [],
-      "security": "high"
-    },
-    {
-      "name": "Zelle",
-      "key": "zelle",
-      "hosts": [
-        "zelle.com",
-        "zellepay.com"
       ],
       "aliases": [],
       "security": "high"
@@ -1302,6 +1277,21 @@
       ],
       "aliases": [],
       "security": "medium"
+    },
+    {
+      "name": "StudentAid",
+      "key": "studentaid",
+      "hosts": [
+        "fafsa.ed.gov",
+        "studentaid.gov",
+        "studentloans.gov"
+      ],
+      "aliases": [
+        "fafsa",
+        "student loans",
+        "studentloans"
+      ],
+      "security": "low"
     },
     {
       "name": "Müze.gov.tr",
