@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": 2026102901,
+  "revision": 2026102902,
   "securityTierOrder": [
     "high",
     "medium",
@@ -320,24 +320,6 @@
       "security": "high"
     },
     {
-      "name": "Nelnet",
-      "key": "nelnet",
-      "hosts": [
-        "nelnet.com"
-      ],
-      "aliases": [],
-      "security": "high"
-    },
-    {
-      "name": "PaymentWorks",
-      "key": "paymentworks",
-      "hosts": [
-        "paymentworks.com"
-      ],
-      "aliases": [],
-      "security": "high"
-    },
-    {
       "name": "PayPal",
       "key": "paypal",
       "hosts": [
@@ -427,20 +409,12 @@
       "security": "high"
     },
     {
-      "name": "SYF",
-      "key": "syf",
-      "hosts": [
-        "syf.com"
-      ],
-      "aliases": [],
-      "security": "high"
-    },
-    {
       "name": "Synchrony",
       "key": "synchrony",
       "hosts": [
         "synchrony.com",
-        "synchronybank.com"
+        "synchronybank.com",
+        "syf.com"
       ],
       "aliases": [],
       "security": "high"
@@ -535,6 +509,24 @@
       ],
       "aliases": [],
       "security": "high"
+    },
+    {
+      "name": "Nelnet",
+      "key": "nelnet",
+      "hosts": [
+        "nelnet.com"
+      ],
+      "aliases": [],
+      "security": "medium"
+    },
+    {
+      "name": "PaymentWorks",
+      "key": "paymentworks",
+      "hosts": [
+        "paymentworks.com"
+      ],
+      "aliases": [],
+      "security": "medium"
     },
     {
       "name": "Alpaca",
