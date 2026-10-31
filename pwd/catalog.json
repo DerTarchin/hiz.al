@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": 2026102903,
+  "revision": 2026103101,
   "securityTierOrder": [
     "high",
     "medium",
@@ -486,6 +486,15 @@
       "security": "high"
     },
     {
+      "name": "Monarch",
+      "key": "monarchmoney",
+      "hosts": [
+        "monarchmoney.com"
+      ],
+      "aliases": [],
+      "security": "high"
+    },
+    {
       "name": "Nelnet",
       "key": "nelnet",
       "hosts": [
@@ -910,15 +919,6 @@
       "aliases": [
         "skype"
       ],
-      "security": "medium"
-    },
-    {
-      "name": "Monarch Money",
-      "key": "monarchmoney",
-      "hosts": [
-        "monarchmoney.com"
-      ],
-      "aliases": [],
       "security": "medium"
     },
     {
