@@ -456,6 +456,29 @@ check(calls.create === 0 && calls.get === 1, `re-saving reuses the passkey with 
 check(record?.format === 2 && record.ctLength === 60, "key saved in the new format");
 await k.close();
 
+console.log("L. Remember with a passphrase and no site still seals the key");
+const l = await openApp();
+await l.load();
+await l.setPhrase(PHRASE);
+await l.page.click("#remember");
+await l.page.waitForFunction(
+  () => document.querySelector("#phrase").placeholder === "Saved on this device",
+  null,
+  { timeout: 60000 },
+);
+check((await l.record())?.ctLength === 60, "sealed without entering a site");
+state = await l.state();
+check(state.remember && state.locked && state.phraseValue === "", "field locks after remembering a passphrase alone");
+await l.reload();
+await l.settle();
+calls = await l.calls();
+check(calls.get === 1 && calls.create === 0, `relaunch asks for Face ID (get=${calls.get})`);
+state = await l.state();
+check(state.placeholder === "Saved on this device" && state.locked, "relaunch restores the passphrase");
+await l.typeSite("amazon");
+check((await l.password()) === expected, "remembered key matches the passphrase");
+await l.close();
+
 await browser.close();
 server.close();
 if (failures) {

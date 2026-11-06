@@ -1389,9 +1389,29 @@ async function enableRemember() {
   }
   const previous = savedRecord;
   prfWrap = { credentialId: record.credentialId, key: enrolled.key };
+  // A site generates the key before Remember is turned on. Typing a passphrase
+  // alone does not, so derive it here or the passkey is saved with nothing to unlock.
   const phrase = normalizePassphrase(phraseInput.value);
-  const key = sessionKey && (!phrase || phrase === sessionPhrase) ? sessionKey : null;
-  const mark = fingerprintMark(phrase) || sessionMark;
+  let key = sessionKey && (!phrase || phrase === sessionPhrase) ? sessionKey : null;
+  if (!key && phrase) {
+    const derived = await deriveMasterKeyOffthread(phrase);
+    const current = normalizePassphrase(phraseInput.value);
+    if (!rememberInput.checked || current !== phrase) {
+      wipe(derived);
+      if (!rememberInput.checked) {
+        signalUnknownCredential(record.credentialId);
+        return;
+      }
+      key = sessionKey && sessionPhrase === current ? sessionKey : null;
+    } else {
+      wipe(sessionKey);
+      sessionKey = derived;
+      sessionPhrase = phrase;
+      sessionFromSaved = false;
+      key = derived;
+    }
+  }
+  const mark = fingerprintMark(phraseInput.value) || sessionMark;
   const packed = key ? packSavedSecret(key, mark) : null;
   let sealed = null;
   try {
