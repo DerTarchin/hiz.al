@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": 2026110602,
+  "revision": 2026110603,
   "securityTierOrder": [
     "high",
     "medium",
@@ -75,9 +75,12 @@
       "name": "Apple",
       "key": "apple",
       "hosts": [
-        "apple.com"
+        "apple.com",
+        "icloud.com"
       ],
-      "aliases": [],
+      "aliases": [
+        "icloud"
+      ],
       "security": "high"
     },
     {
@@ -259,15 +262,6 @@
         "gmail",
         "youtube"
       ],
-      "security": "high"
-    },
-    {
-      "name": "iCloud",
-      "key": "icloud",
-      "hosts": [
-        "icloud.com"
-      ],
-      "aliases": [],
       "security": "high"
     },
     {
