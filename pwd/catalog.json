@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": 2026103101,
+  "revision": 2026110601,
   "securityTierOrder": [
     "high",
     "medium",
@@ -281,6 +281,17 @@
         "invoicecloud.com"
       ],
       "aliases": [],
+      "security": "high"
+    },
+    {
+      "name": "Interactive Brokers",
+      "key": "interactive brokers",
+      "hosts": [
+        "interactivebrokers.com"
+      ],
+      "aliases": [
+        "ibkr"
+      ],
       "security": "high"
     },
     {
