@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": 2026110601,
+  "revision": 2026110602,
   "securityTierOrder": [
     "high",
     "medium",
@@ -247,22 +247,18 @@
       "security": "high"
     },
     {
-      "name": "Gmail",
-      "key": "gmail",
-      "hosts": [
-        "gmail.com",
-        "mail.google.com"
-      ],
-      "aliases": [],
-      "security": "high"
-    },
-    {
       "name": "Google",
       "key": "google",
       "hosts": [
-        "google.com"
+        "google.com",
+        "gmail.com",
+        "mail.google.com",
+        "youtube.com"
       ],
-      "aliases": [],
+      "aliases": [
+        "gmail",
+        "youtube"
+      ],
       "security": "high"
     },
     {
@@ -1257,15 +1253,6 @@
       "key": "yahoo",
       "hosts": [
         "yahoo.com"
-      ],
-      "aliases": [],
-      "security": "medium"
-    },
-    {
-      "name": "YouTube",
-      "key": "youtube",
-      "hosts": [
-        "youtube.com"
       ],
       "aliases": [],
       "security": "medium"
