@@ -6,7 +6,7 @@ import {
   normalizeSiteVersion,
   passwordFromMaster,
 } from "./derive.js";
-import { mountPassphraseFingerprint } from "./passphrase-fingerprint.js";
+import { mountPassphraseFingerprint, passphraseFingerprintHash } from "./passphrase-fingerprint.js";
 import { buildMenu, cleanHostInput, loadSiteCatalog, matchHighlightRange, rowForInput } from "./sites.js";
 
 const phraseInput = document.querySelector("#phrase");
@@ -41,9 +41,13 @@ const PHRASE_IDLE_MS = 250;
  * key comes from the WebAuthn PRF extension of a platform passkey, so reading
  * the saved key back needs Face ID / Touch ID. Stored record:
  *   { v: 2, credentialId, prfSalt, iv, ct }   (iv/ct are absent until a key is saved)
- * Records from before v2 held the AES key next to the ciphertext and are dropped.
+ * The sealed plaintext is the 32-byte master key, then the 12-digit fingerprint
+ * mark when we have one. Older seals are just the key. Records from before v2
+ * held the AES key next to the ciphertext and are dropped.
  */
 const RECORD_VERSION = 2;
+const MASTER_KEY_BYTES = 32;
+const FINGERPRINT_MARK = /^[0-4]{12}$/;
 const WRAP_INFO = new TextEncoder().encode("hiz.al/pwd remember v2");
 const RELOCK_AFTER_MS = 60 * 1000;
 const PLACEHOLDER_DEFAULT = "Long memorable phrase";
@@ -55,6 +59,7 @@ const PRF_UNSUPPORTED = "This device can't lock a remembered passphrase behind F
 
 let sessionKey = null;
 let sessionPhrase = "";
+let sessionMark = "";
 let sessionFromSaved = false;
 let savedRecord = null;
 let passkeyUserId = null;
@@ -90,13 +95,10 @@ function rememberEnabled() {
     && rememberInput.checked;
 }
 
-function isIosDevice() {
-  return /iphone|ipad|ipod/i.test(navigator.userAgent);
-}
-
 function shouldLockPassphrase() {
-  return isIosDevice()
-    && document.documentElement.classList.contains("pwa-standalone")
+  // Every installed app, not only an iPhone user agent. iPad and Mac web apps
+  // report a desktop UA and still unlock with Face ID / Touch ID.
+  return document.documentElement.classList.contains("pwa-standalone")
     && rememberInput.checked
     && (Boolean(sessionKey) || hasSavedKey())
     && !phraseInput.value.trim();
@@ -121,6 +123,26 @@ function syncPassphrasePlaceholder() {
   else phraseInput.placeholder = savedKeyLocked() ? PLACEHOLDER_LOCKED : PLACEHOLDER_SAVED;
 }
 
+function fingerprintMark(phrase) {
+  const text = normalizePassphrase(phrase);
+  if (!text) return "";
+  const mark = passphraseFingerprintHash(text);
+  return FINGERPRINT_MARK.test(mark) ? mark : "";
+}
+
+/** Empty field with a saved key shows that key's fingerprint, not a blank one. */
+function syncPassphraseFingerprint() {
+  if (phraseInput.value) {
+    passphraseFingerprint.update(phraseInput.value);
+    return;
+  }
+  if (sessionMark && (sessionFromSaved || hasSavedKey())) {
+    passphraseFingerprint.updateHash(sessionMark);
+    return;
+  }
+  passphraseFingerprint.update("");
+}
+
 function updatePassphraseFieldState() {
   syncPassphrasePlaceholder();
   syncLockedResult();
@@ -134,11 +156,11 @@ function updatePassphraseFieldState() {
   if (lock) {
     phraseInput.setAttribute("readonly", "");
     phraseInput.setAttribute("aria-disabled", "true");
-    return;
+  } else {
+    phraseInput.removeAttribute("aria-disabled");
+    if (!phraseInput.value) phraseInput.setAttribute("readonly", "");
   }
-  phraseInput.removeAttribute("aria-disabled");
-  if (!phraseInput.value) phraseInput.setAttribute("readonly", "");
-  passphraseFingerprint.update(phraseInput.value);
+  syncPassphraseFingerprint();
 }
 
 /** Shows or clears "Tap to unlock" in the password area. */
@@ -178,14 +200,31 @@ phraseInput.addEventListener("focus", () => {
   focusSite();
 });
 
-phraseInput.addEventListener("mousedown", () => {
-  if (shouldLockPassphrase()) return;
+phraseInput.addEventListener("pointerdown", (event) => {
+  if (!shouldLockPassphrase()) return;
+  event.preventDefault();
+});
+
+phraseInput.addEventListener("mousedown", (event) => {
+  if (shouldLockPassphrase()) {
+    event.preventDefault();
+    return;
+  }
   phraseInput.removeAttribute("readonly");
 });
 
-phraseInput.addEventListener("keydown", () => {
-  if (shouldLockPassphrase()) return;
-  phraseInput.removeAttribute("readonly");
+phraseInput.addEventListener("beforeinput", (event) => {
+  if (!shouldLockPassphrase()) return;
+  event.preventDefault();
+});
+
+phraseInput.addEventListener("keydown", (event) => {
+  if (!shouldLockPassphrase()) {
+    phraseInput.removeAttribute("readonly");
+    return;
+  }
+  if (event.key === "Tab") return;
+  event.preventDefault();
 });
 
 phraseField.addEventListener("click", () => {
@@ -197,7 +236,7 @@ phraseInput.addEventListener("input", () => {
   syncPassphrasePlaceholder();
   clearCopiedFeedback();
   flushPendingAutoCopy();
-  passphraseFingerprint.update(phraseInput.value);
+  syncPassphraseFingerprint();
   scheduleIdleGenerate();
   scheduleCopyAfterIdle();
 });
@@ -346,18 +385,19 @@ async function boot() {
   void loadSiteCatalog().catch(() => {});
   const standalone = document.documentElement.classList.contains("pwa-standalone");
   try {
-    const userId = await readStored(PASSKEY_USER);
-    if (userId instanceof Uint8Array) passkeyUserId = userId;
+    const userId = asBytes(await readStored(PASSKEY_USER));
+    if (userId) passkeyUserId = userId;
   } catch {
     /* Remember makes a new passkey user handle when it is turned on */
   }
-  let saved = null;
+  let stored = null;
   try {
-    saved = await readStored(RECORD);
+    stored = await readStored(RECORD);
   } catch {
-    saved = null;
+    stored = null;
   }
-  if (saved && !isCurrentRecord(saved)) {
+  let saved = normalizeRecord(stored);
+  if (stored && !saved) {
     saved = null;
     try {
       await deleteStored(RECORD);
@@ -436,6 +476,7 @@ async function onRememberToggle() {
     } finally {
       rememberPromise = null;
       updatePassphraseFieldState();
+      if (shouldLockPassphrase() && document.activeElement === phraseInput) focusSite();
     }
     return;
   }
@@ -824,14 +865,14 @@ async function deriveSessionKey(phrase) {
   sessionKey = derived;
   sessionPhrase = phrase;
   sessionFromSaved = false;
-  if (rememberEnabled()) await rememberDerivedKey(derived);
+  if (rememberEnabled()) await rememberDerivedKey(derived, fingerprintMark(phrase));
   return derived;
 }
 
-async function rememberDerivedKey(key) {
+async function rememberDerivedKey(key, mark) {
   let saved = false;
   try {
-    saved = await saveMasterKey(key);
+    saved = await saveMasterKey(key, mark);
   } catch (error) {
     showError(error?.cancelled
       ? "Passphrase not saved because Face ID was cancelled."
@@ -839,10 +880,12 @@ async function rememberDerivedKey(key) {
     return;
   }
   if (!saved || sessionKey !== key) return;
+  sessionMark = mark || sessionMark;
   phraseInput.value = "";
   sessionPhrase = "";
   sessionFromSaved = true;
   updatePassphraseFieldState();
+  if (document.activeElement === phraseInput) focusSite();
 }
 
 async function performAutoCopy(text) {
@@ -1302,10 +1345,38 @@ function deleteStored(key) {
   return withStore("readwrite", (store) => store.delete(key));
 }
 
-function isCurrentRecord(record) {
-  return record?.v === RECORD_VERSION
-    && record.credentialId instanceof Uint8Array
-    && record.prfSalt instanceof Uint8Array;
+/** IndexedDB may hand back an ArrayBuffer, or a view from another realm. */
+function asBytes(value) {
+  if (value == null) return null;
+  try {
+    if (ArrayBuffer.isView(value) || value instanceof ArrayBuffer) return new Uint8Array(value);
+  } catch {
+    /* not a view this realm can wrap */
+  }
+  if (Object.prototype.toString.call(value) === "[object ArrayBuffer]") {
+    try {
+      return new Uint8Array(value);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+function normalizeRecord(record) {
+  if (!record || record.v !== RECORD_VERSION) return null;
+  const credentialId = asBytes(record.credentialId);
+  const prfSalt = asBytes(record.prfSalt);
+  if (!credentialId?.length || !prfSalt?.length) return null;
+  const normalized = { v: RECORD_VERSION, credentialId, prfSalt };
+  if (record.format != null) normalized.format = record.format;
+  const iv = asBytes(record.iv);
+  const ct = asBytes(record.ct);
+  if (iv?.length && ct?.length) {
+    normalized.iv = iv;
+    normalized.ct = ct;
+  }
+  return normalized;
 }
 
 /** Turning Remember on makes a passkey and saves the current key under it. */
@@ -1320,12 +1391,19 @@ async function enableRemember() {
   prfWrap = { credentialId: record.credentialId, key: enrolled.key };
   const phrase = normalizePassphrase(phraseInput.value);
   const key = sessionKey && (!phrase || phrase === sessionPhrase) ? sessionKey : null;
-  const next = key
-    ? { ...record, format: FORMAT_VERSION, ...(await sealMasterKey(key, enrolled.key)) }
-    : record;
+  const mark = fingerprintMark(phrase) || sessionMark;
+  const packed = key ? packSavedSecret(key, mark) : null;
+  let sealed = null;
+  try {
+    sealed = packed ? await sealMasterKey(packed, enrolled.key) : null;
+  } finally {
+    wipe(packed);
+  }
+  const next = sealed ? { ...record, format: FORMAT_VERSION, ...sealed } : record;
   await writeStored(RECORD, next);
   savedRecord = next;
   if (key && sessionKey === key) {
+    sessionMark = mark;
     sessionFromSaved = true;
     phraseInput.value = "";
     sessionPhrase = "";
@@ -1340,6 +1418,7 @@ async function forgetSavedKey() {
   savedRecord = null;
   prfWrap = null;
   sessionFromSaved = false;
+  sessionMark = "";
   wipe(sessionKey);
   sessionKey = null;
   sessionPhrase = "";
@@ -1348,8 +1427,8 @@ async function forgetSavedKey() {
 }
 
 /** Returns false when a newer key replaced this one before the save finished. */
-async function saveMasterKey(bytes) {
-  const plain = bytes.slice();
+async function saveMasterKey(bytes, mark) {
+  const plain = packSavedSecret(bytes, mark);
   try {
     if (rememberPromise) await rememberPromise.catch(() => {});
     const record = savedRecord;
@@ -1397,11 +1476,14 @@ function unlockSavedKey() {
         throw new Error("The saved passphrase could not be unlocked, so it was removed. Enter it again.");
       }
       if (savedRecord !== record) throw new Error("Remember changed while unlocking. Try again.");
+      const saved = unpackSavedSecret(plain);
       wipe(sessionKey);
-      sessionKey = new Uint8Array(plain);
+      sessionKey = saved.key;
+      sessionMark = saved.mark;
       sessionPhrase = "";
       sessionFromSaved = true;
       updatePassphraseFieldState();
+      if (document.activeElement === phraseInput) focusSite();
       return sessionKey;
     })
     .finally(() => {
@@ -1525,6 +1607,28 @@ async function wrapKeyFromSecret(secret) {
   } finally {
     wipe(secret);
   }
+}
+
+function packSavedSecret(key, mark) {
+  const keyBytes = new Uint8Array(key).subarray(0, MASTER_KEY_BYTES);
+  const markText = typeof mark === "string" && FINGERPRINT_MARK.test(mark) ? mark : "";
+  if (!markText) return new Uint8Array(keyBytes);
+  const packed = new Uint8Array(MASTER_KEY_BYTES + markText.length);
+  packed.set(keyBytes, 0);
+  packed.set(new TextEncoder().encode(markText), MASTER_KEY_BYTES);
+  return packed;
+}
+
+function unpackSavedSecret(plain) {
+  const bytes = new Uint8Array(plain);
+  const key = bytes.slice(0, MASTER_KEY_BYTES);
+  let mark = "";
+  if (bytes.length >= MASTER_KEY_BYTES + 12) {
+    const text = new TextDecoder().decode(bytes.subarray(MASTER_KEY_BYTES, MASTER_KEY_BYTES + 12));
+    if (FINGERPRINT_MARK.test(text)) mark = text;
+  }
+  bytes.fill(0);
+  return { key, mark };
 }
 
 async function sealMasterKey(bytes, key) {

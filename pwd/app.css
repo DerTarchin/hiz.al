@@ -677,10 +677,6 @@ html.passphrase-locked.passphrase-sealed #phrase {
   pointer-events: none;
 }
 
-html.passphrase-locked .passphrase-fingerprint {
-  opacity: 0.5;
-}
-
 .fine {
   position: fixed;
   left: 0;

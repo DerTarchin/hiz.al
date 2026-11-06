@@ -132,13 +132,29 @@ export function mountPassphraseFingerprint(svgRoot) {
     }
   };
 
-  const update = (passphrase) => {
-    target = passphraseFingerprintValues(passphrase);
+  const same = (a, b) => a.length === b.length && a.every((value, index) => value === b[index]);
+
+  const applyTarget = (values) => {
+    if (!frame && same(target, values) && same(displayed, values)) return;
+    target = values.slice();
     animFrom = displayed.slice();
     animStart = performance.now();
     if (!frame) frame = requestAnimationFrame(tick);
   };
 
+  const update = (passphrase) => {
+    applyTarget(passphraseFingerprintValues(passphrase));
+  };
+
+  /** 12 band digits, the same string passphraseFingerprintHash() returns. */
+  const updateHash = (hash) => {
+    const text = String(hash ?? "");
+    const values = text.length === POINTS
+      ? [...text].map((char) => bandToLegacyValue(Number(char)))
+      : Array(POINTS).fill(NEUTRAL);
+    applyTarget(values);
+  };
+
   draw();
-  return { update };
+  return { update, updateHash };
 }

@@ -164,6 +164,7 @@ async function openApp({ hasPrf = true, stripCreatePrf = false } = {}) {
       const el = document.querySelector("#error");
       return el.hidden ? "" : el.textContent;
     }),
+    fingerprint: () => page.evaluate(() => document.querySelector("#passphrase-fingerprint path")?.getAttribute("d") || ""),
     state: () => page.evaluate(() => ({
       remember: document.querySelector("#remember").checked,
       phraseValue: document.querySelector("#phrase").value,
@@ -221,6 +222,8 @@ async function openApp({ hasPrf = true, stripCreatePrf = false } = {}) {
 console.log("A. Remember off: no passkey prompts at all");
 const a = await openApp();
 await a.load();
+const neutralPath = await a.fingerprint();
+check(neutralPath.length > 0, "fingerprint draws before a passphrase is typed");
 check((await a.state()).remember === false, "remember starts off");
 await a.setPhrase(PHRASE);
 await a.typeSite("amazon");
@@ -242,11 +245,17 @@ calls = await a.calls();
 check(calls.create === 1, `one passkey created (create=${calls.create}, get=${calls.get})`);
 check(await a.credentialCount() === 1, "authenticator holds one passkey");
 let record = await a.record();
-check(record?.v === 2 && record.format === 2 && record.ctLength === 48, `v2 record with sealed key (${JSON.stringify(record)})`);
+check(record?.v === 2 && record.format === 2 && record.ctLength === 60, `v2 record with sealed key (${JSON.stringify(record)})`);
 check(record && !record.hasCryptoKey, "no AES key stored next to the ciphertext");
 let state = await a.state();
 check(state.remember && state.phraseValue === "", "remember on and passphrase field cleared");
 check(state.locked && !state.sealed, "field shows saved-and-unlocked state");
+await a.page.waitForFunction((neutral) => {
+  const path = document.querySelector("#passphrase-fingerprint path")?.getAttribute("d") || "";
+  return path.length > 0 && path !== neutral;
+}, neutralPath, { timeout: 10000 });
+const savedPath = await a.fingerprint();
+check(savedPath !== neutralPath, "saved passphrase keeps its fingerprint");
 
 console.log("C. Relaunch with Remember: one Face ID prompt at launch, none while typing");
 await a.reload();
@@ -255,6 +264,11 @@ calls = await a.calls();
 check(calls.get === 1 && calls.create === 0, `one prompt at launch (get=${calls.get})`);
 state = await a.state();
 check(state.placeholder === "Saved on this device" && !state.sealed, `unlocked at launch ("${state.placeholder}")`);
+check(state.locked, "unlocked saved passphrase is not an editable field");
+await a.page.waitForFunction((expected) => {
+  return document.querySelector("#passphrase-fingerprint path")?.getAttribute("d") === expected;
+}, savedPath, { timeout: 10000 });
+check((await a.fingerprint()) === savedPath, "unlock restores the saved fingerprint");
 check(state.resultHidden, "password area stays empty until a site is typed");
 await a.typeSite("amazon");
 check((await a.password()) === expected, "unlocked key yields the same password");
@@ -298,7 +312,7 @@ await a.typeSite("amazon");
 await a.page.waitForTimeout(400);
 calls = await a.calls();
 check(calls.get === 1 && (await a.state()).passwordText === "Tap to unlock", "typing after cancel does not prompt");
-check((await a.record())?.ctLength === 48, "cancel keeps the saved key");
+check((await a.record())?.ctLength === 60, "cancel keeps the saved key");
 await a.page.click("#phrase-field");
 check((await a.password()) === expected, "tapping the passphrase field unlocks and generates");
 calls = await a.calls();
@@ -341,7 +355,7 @@ await h.typeSite("amazon");
 check((await h.password()) === expected, "password matches");
 calls = await h.calls();
 check(calls.get === 1, "saving right after enrolling reuses the unlocked wrap key");
-check((await h.record())?.ctLength === 48, "key saved");
+check((await h.record())?.ctLength === 60, "key saved");
 await h.page.click("#remember");
 await h.page.waitForTimeout(200);
 await h.page.click("#remember");
@@ -354,7 +368,7 @@ await h.typeSite("amazon");
 check((await h.password()) === expected, "password matches");
 await h.page.waitForFunction(() => document.querySelector("#phrase").value === "", null, { timeout: 10000 });
 calls = await h.calls();
-check(calls.get === 1 && (await h.record())?.ctLength === 48, `saving after relaunch prompts once (get=${calls.get})`);
+check(calls.get === 1 && (await h.record())?.ctLength === 60, `saving after relaunch prompts once (get=${calls.get})`);
 await h.reload();
 await h.typeSite("amazon");
 check((await h.password()) === expected, "unlock after relaunch matches");
@@ -439,7 +453,7 @@ await k.page.waitForFunction(() => document.querySelector("#phrase").value === "
 calls = await k.calls();
 record = await k.record();
 check(calls.create === 0 && calls.get === 1, `re-saving reuses the passkey with one prompt (create=${calls.create}, get=${calls.get})`);
-check(record?.format === 2 && record.ctLength === 48, "key saved in the new format");
+check(record?.format === 2 && record.ctLength === 60, "key saved in the new format");
 await k.close();
 
 await browser.close();
