@@ -152,7 +152,7 @@ function updatePassphraseFieldState() {
     "passphrase-sealed",
     savedKeyLocked() && !phraseInput.value,
   );
-  phraseInput.tabIndex = lock ? -1 : 0;
+  phraseInput.tabIndex = lock ? -1 : 1;
   if (lock) {
     phraseInput.setAttribute("readonly", "");
     phraseInput.setAttribute("aria-disabled", "true");
@@ -299,20 +299,6 @@ siteInput.addEventListener("blur", (event) => {
   if (next === siteClearBtn) return;
   void onCredentialsCommit(null, { implicit: true });
 });
-
-siteInput.addEventListener("keydown", (event) => {
-  const menu = currentMenu();
-  if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-    if (!menu.rows.length) return;
-    event.preventDefault();
-    pinned = null;
-    const delta = event.key === "ArrowDown" ? 1 : -1;
-    const start = menu.active < 0 ? (delta > 0 ? -1 : 0) : menu.active;
-    manualActive = (start + delta + menu.rows.length) % menu.rows.length;
-    renderMenu();
-  }
-});
-
 
 form.addEventListener("keydown", (event) => {
   if (event.key !== "Enter" || event.target instanceof HTMLTextAreaElement) return;
@@ -1121,6 +1107,7 @@ function renderMenu() {
     item.setAttribute("role", "presentation");
     const button = document.createElement("button");
     button.type = "button";
+    button.tabIndex = -1;
     button.id = `opt-${index}`;
     button.setAttribute("role", "option");
     button.setAttribute("aria-selected", index === menu.active ? "true" : "false");
@@ -1212,6 +1199,7 @@ function openVersionMenu() {
     item.setAttribute("role", "presentation");
     const option = document.createElement("button");
     option.type = "button";
+    option.tabIndex = -1;
     option.setAttribute("role", "option");
     option.setAttribute("aria-selected", version === current ? "true" : "false");
     const label = document.createElement("span");
@@ -1230,7 +1218,85 @@ function openVersionMenu() {
   }
   versionMenu.hidden = false;
   versionBtn.setAttribute("aria-expanded", "true");
+  const options = versionOptions();
+  const selected = options.findIndex((option) => option.getAttribute("aria-selected") === "true");
+  indicateVersion(selected >= 0 ? selected : 0);
 }
+
+function versionOptions() {
+  return [...versionMenu.querySelectorAll("button")];
+}
+
+function indicatedVersionIndex() {
+  const options = versionOptions();
+  const marked = options.findIndex((option) => option.classList.contains("is-indicated"));
+  if (marked >= 0) return marked;
+  const selected = options.findIndex((option) => option.getAttribute("aria-selected") === "true");
+  return selected >= 0 ? selected : 0;
+}
+
+/** Moves the highlighted version without taking focus away from another field. */
+function indicateVersion(index) {
+  const options = versionOptions();
+  if (!options.length) return;
+  const next = (index + options.length) % options.length;
+  options.forEach((option, i) => {
+    option.classList.toggle("is-indicated", i === next);
+  });
+  const option = options[next];
+  if (versionMenu.contains(document.activeElement)) option.focus({ preventScroll: true });
+}
+
+function moveVersionSelection(step) {
+  indicateVersion(indicatedVersionIndex() + step);
+}
+
+function moveSiteSelection(delta) {
+  const menu = currentMenu();
+  if (!menu.rows.length) return false;
+  pinned = null;
+  const start = menu.active < 0 ? (delta > 0 ? -1 : 0) : menu.active;
+  manualActive = (start + delta + menu.rows.length) % menu.rows.length;
+  renderMenu();
+  return true;
+}
+
+/**
+ * An open version menu owns the arrow keys from anywhere. Otherwise, arrows
+ * move the site list only while the site field or its clear button is focused.
+ */
+document.addEventListener("keydown", (event) => {
+  if (event.altKey || event.ctrlKey || event.metaKey) return;
+  const key = event.key;
+  if (!versionMenu.hidden && (key === "ArrowDown" || key === "ArrowUp")) {
+    event.preventDefault();
+    event.stopPropagation();
+    moveVersionSelection(key === "ArrowDown" ? 1 : -1);
+    return;
+  }
+  if (!versionMenu.hidden && key === "Enter") {
+    const option = versionMenu.querySelector(".is-indicated")
+      ?? versionMenu.querySelector('[aria-selected="true"]');
+    if (!option) return;
+    event.preventDefault();
+    event.stopPropagation();
+    option.click();
+    return;
+  }
+  if (!versionMenu.hidden && key === "Escape") {
+    event.preventDefault();
+    event.stopPropagation();
+    closeVersionMenu();
+    if (versionMenu.contains(document.activeElement)) versionBtn.focus();
+    return;
+  }
+  if (key !== "ArrowDown" && key !== "ArrowUp") return;
+  const focus = document.activeElement;
+  if (focus !== siteInput && focus !== siteClearBtn) return;
+  if (!moveSiteSelection(key === "ArrowDown" ? 1 : -1)) return;
+  event.preventDefault();
+  event.stopPropagation();
+}, true);
 
 function closeVersionMenu() {
   if (versionMenu.hidden) return;
@@ -1258,25 +1324,11 @@ versionBtn.addEventListener("click", () => {
   else closeVersionMenu();
 });
 
-versionMenu.addEventListener("keydown", (event) => {
-  const options = [...versionMenu.querySelectorAll("button")];
-  const index = options.indexOf(document.activeElement);
-  if (event.key === "Escape") {
-    event.preventDefault();
-    closeVersionMenu();
-    versionBtn.focus();
-  } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-    event.preventDefault();
-    const step = event.key === "ArrowDown" ? 1 : -1;
-    options[(index + step + options.length) % options.length]?.focus();
-  }
-});
-
 versionBtn.addEventListener("keydown", (event) => {
-  if (event.key !== "ArrowDown") return;
+  if (event.key !== "ArrowDown" || !versionMenu.hidden) return;
   event.preventDefault();
   openVersionMenu();
-  versionMenu.querySelector('[aria-selected="true"]')?.focus();
+  versionMenu.querySelector(".is-indicated")?.focus();
 });
 
 document.addEventListener("pointerdown", (event) => {

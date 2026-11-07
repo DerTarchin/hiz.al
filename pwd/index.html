@@ -124,6 +124,7 @@
             id="remember"
             type="checkbox"
             role="switch"
+            tabindex="1"
             aria-label="Remember passphrase on this device"
           >
         </label>
@@ -158,6 +159,7 @@
             data-gramm_editor="false"
             data-enable-grammarly="false"
             data-hiz-pwd-ignore
+            tabindex="1"
             readonly
           >
           <svg
@@ -206,6 +208,7 @@
             aria-expanded="false"
             aria-controls="version-menu"
             aria-label="Password version 1"
+            tabindex="3"
           >v1</button>
           <ul class="version-menu" id="version-menu" role="listbox" aria-label="Password version" hidden></ul>
         </div>
@@ -225,6 +228,7 @@
             spellcheck="false"
             enterkeyhint="go"
             placeholder="Name or URL"
+            tabindex="2"
             data-1p-ignore
             data-lpignore="true"
           >
@@ -233,6 +237,7 @@
             id="site-clear"
             type="button"
             hidden
+            tabindex="4"
             aria-label="Clear site"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -249,7 +254,7 @@
 
     <div class="result" id="result" hidden>
       <p class="password" id="password" translate="no"></p>
-      <button class="copy-btn" id="copy" type="button" aria-label="Copy password">
+      <button class="copy-btn" id="copy" type="button" tabindex="5" aria-label="Copy password">
         <span class="copy-btn__icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
             <rect x="8.2" y="8.2" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"></rect>

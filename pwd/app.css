@@ -251,7 +251,8 @@ html.pwa-standalone .remember-toggle {
 }
 
 .version-menu button:hover,
-.version-menu button:focus-visible {
+.version-menu button:focus-visible,
+.version-menu button.is-indicated {
   background: var(--surface-hover);
   outline: none;
 }
