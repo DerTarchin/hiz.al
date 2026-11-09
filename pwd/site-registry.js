@@ -43,6 +43,9 @@ export function normalizeCatalog(raw) {
       aliases: Array.isArray(entry.aliases)
         ? entry.aliases.map((alias) => String(alias).toLowerCase())
         : [],
+      hostPatterns: Array.isArray(entry.hostPatterns)
+        ? entry.hostPatterns.map((pattern) => String(pattern))
+        : [],
     };
   });
 
@@ -78,6 +81,13 @@ export function createSiteRegistry(catalog) {
     return entry;
   });
 
+  const hostPatternMatchers = sites
+    .filter((entry) => entry.hostPatterns.length > 0)
+    .map((entry) => ({
+      entry,
+      patterns: entry.hostPatterns.map((source) => new RegExp(source, "i")),
+    }));
+
   function compoundSuffixSize(labels) {
     if (labels.length >= 2 && compoundSuffixes.has(labels.slice(-2).join("."))) return 2;
     return 1;
@@ -89,6 +99,10 @@ export function createSiteRegistry(catalog) {
     for (let i = 0; i < labels.length; i += 1) {
       const hit = hostIndex.get(labels.slice(i).join("."));
       if (hit) return hit;
+    }
+    const hostname = labels.join(".");
+    for (const { entry, patterns } of hostPatternMatchers) {
+      if (patterns.some((pattern) => pattern.test(hostname))) return entry;
     }
     const suffix = compoundSuffixSize(labels);
     const nameIndex = labels.length - suffix - 1;

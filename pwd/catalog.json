@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": 2026110603,
+  "revision": 2026110901,
   "securityTierOrder": [
     "high",
     "medium",
@@ -1610,6 +1610,24 @@
       "key": "bmwcca",
       "hosts": [
         "bmwcca.org"
+      ],
+      "aliases": [],
+      "security": "low"
+    },
+    {
+      "name": "Blueflame",
+      "key": "blueflame",
+      "hosts": [
+        "app.blueflame.ai",
+        "app.eu.blueflame.ai",
+        "app.staging.blueflame.ai",
+        "app-staging.blueflame.ai",
+        "app.eu-staging.blueflame.ai",
+        "app.dev.blueflame.ai",
+        "blueflame-ui-dea-142-save-account-by-id-blue-flame-78ec6424.vercel.app"
+      ],
+      "hostPatterns": [
+        "^blueflame-ui-.+-blue-flame-78ec6424\\.vercel\\.app$"
       ],
       "aliases": [],
       "security": "low"
