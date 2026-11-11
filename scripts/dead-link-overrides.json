@@ -1,0 +1,13 @@
+{
+  "_comment": "Manual/browser-confirmed statuses for targets that plain HTTP or headless CF challenges cannot resolve reliably. status: alive | dead | soft-alive",
+  "bySlug": {
+    "photo": {
+      "status": "alive",
+      "detail": "override: Cloudflare challenge resolves to photography.hizalcelik.com (Endless Road)"
+    },
+    "playlists": {
+      "status": "dead",
+      "detail": "override: Cloudflare Error 1016 Origin DNS error (8tracks.com is gone)"
+    }
+  }
+}
